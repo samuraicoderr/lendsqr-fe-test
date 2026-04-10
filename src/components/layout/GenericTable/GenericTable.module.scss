@@ -92,7 +92,7 @@ $radius-dropdown: 4px;
 
 .tableContainer {
   width: 100%;
-  max-width: $table-width;
+  // max-width: $table-width;
   background: $color-white;
   border: 1px solid $color-border;
   box-shadow: $shadow-table;
@@ -236,9 +236,7 @@ $radius-dropdown: 4px;
 // ============================================
 
 .filterDropdown {
-  position: absolute;
-  top: 68px;
-  right: 20px;
+  position: fixed;
   width: 320px;
   max-height: 80vh;
   overflow-y: auto;
@@ -247,7 +245,7 @@ $radius-dropdown: 4px;
   box-shadow: $shadow-filter;
   border-radius: $radius-dropdown;
   padding: 20px;
-  z-index: 200;
+  z-index: 3100;
   animation: dropdownEnter $transition-base;
 }
 
@@ -537,9 +535,7 @@ $radius-dropdown: 4px;
 }
 
 .rowMenuDropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
+  position: fixed;
   width: $row-menu-width;
   min-height: $row-menu-height;
   background: $color-white;
@@ -549,7 +545,7 @@ $radius-dropdown: 4px;
   padding: 12px 0;
   z-index: 150;
   animation: menuEnter $transition-base;
-  margin-top: 8px;
+  margin-top: 0;
 }
 
 @keyframes menuEnter {

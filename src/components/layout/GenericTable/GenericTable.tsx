@@ -159,11 +159,16 @@ function GenericTable<T extends Record<string, any>>({
   onRowClick,
   pagination
 }: GenericTableProps<T>) {
+  const FILTER_DROPDOWN_WIDTH = 320;
+  const ROW_MENU_WIDTH = 180;
+
   // State
   const [activeFilterColumn, setActiveFilterColumn] = useState<string | null>(null);
   const [filterValues, setFilterValues] = useState<FilterValues>({});
   const [activeRowMenu, setActiveRowMenu] = useState<number | null>(null);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
+  const [filterDropdownPosition, setFilterDropdownPosition] = useState<{ top: number; left: number }>({ top: 80, left: 20 });
+  const [rowMenuPosition, setRowMenuPosition] = useState<{ top: number; left: number }>({ top: 80, left: 20 });
 
   // Refs
   const filterDropdownRef = useRef<HTMLDivElement>(null);
@@ -216,14 +221,54 @@ function GenericTable<T extends Record<string, any>>({
   }, [onReset]);
 
   // Toggle filter dropdown
-  const toggleFilterDropdown = useCallback((columnKey: string) => {
+  const toggleFilterDropdown = useCallback((columnKey: string, buttonIndex: number) => {
     setActiveFilterColumn(prev => prev === columnKey ? null : columnKey);
+    const button = filterButtonRefs.current[buttonIndex];
+    if (button) {
+      const rect = button.getBoundingClientRect();
+      const desiredLeft = rect.left + rect.width - FILTER_DROPDOWN_WIDTH;
+      const viewportPadding = 12;
+      const maxLeft = window.innerWidth - FILTER_DROPDOWN_WIDTH - viewportPadding;
+      const safeLeft = Math.max(viewportPadding, Math.min(desiredLeft, maxLeft));
+
+      setFilterDropdownPosition({
+        top: rect.bottom + 10,
+        left: safeLeft,
+      });
+    }
     setActiveRowMenu(null);
   }, []);
 
   // Toggle row menu
   const toggleRowMenu = useCallback((index: number) => {
     setActiveRowMenu(prev => prev === index ? null : index);
+    const rowMenuTrigger = rowMenuRefs.current[index];
+    if (rowMenuTrigger) {
+      const rect = rowMenuTrigger.getBoundingClientRect();
+      const viewportPadding = 12;
+      const desiredLeft = rect.right - ROW_MENU_WIDTH;
+      const maxLeft = window.innerWidth - ROW_MENU_WIDTH - viewportPadding;
+      const safeLeft = Math.max(viewportPadding, Math.min(desiredLeft, maxLeft));
+
+      setRowMenuPosition({
+        top: rect.bottom + 8,
+        left: safeLeft,
+      });
+    }
+    setActiveFilterColumn(null);
+  }, []);
+
+  const openRowMenuAtPointer = useCallback((index: number, x: number, y: number) => {
+    const viewportPadding = 12;
+    const maxLeft = window.innerWidth - ROW_MENU_WIDTH - viewportPadding;
+    const safeLeft = Math.max(viewportPadding, Math.min(x, maxLeft));
+    const safeTop = Math.max(viewportPadding, y);
+
+    setRowMenuPosition({
+      top: safeTop,
+      left: safeLeft,
+    });
+    setActiveRowMenu(index);
     setActiveFilterColumn(null);
   }, []);
 
@@ -241,6 +286,25 @@ function GenericTable<T extends Record<string, any>>({
   }, []);
 
   const isFilterDropdownOpen = activeFilterColumn !== null;
+
+  useEffect(() => {
+    if (!isFilterDropdownOpen && activeRowMenu === null) {
+      return;
+    }
+
+    const closeMenus = () => {
+      setActiveFilterColumn(null);
+      setActiveRowMenu(null);
+    };
+
+    window.addEventListener('resize', closeMenus);
+    window.addEventListener('scroll', closeMenus, true);
+
+    return () => {
+      window.removeEventListener('resize', closeMenus);
+      window.removeEventListener('scroll', closeMenus, true);
+    };
+  }, [isFilterDropdownOpen, activeRowMenu]);
 
   // Sort data
   const sortedData = useMemo(() => {
@@ -295,7 +359,7 @@ function GenericTable<T extends Record<string, any>>({
                           filterButtonRefs.current[index] = el;
                         }}
                         className={`${styles.filterButton} ${activeFilterColumn === column.key ? styles.filterButtonActive : ''}`}
-                        onClick={() => toggleFilterDropdown(column.key)}
+                        onClick={() => toggleFilterDropdown(column.key, index)}
                         aria-label={`Filter by ${column.title}`}
                         aria-expanded={activeFilterColumn === column.key}
                       >
@@ -349,8 +413,7 @@ function GenericTable<T extends Record<string, any>>({
                       return;
                     }
                     e.preventDefault();
-                    setActiveRowMenu(rowIndex);
-                    setActiveFilterColumn(null);
+                    openRowMenuAtPointer(rowIndex, e.clientX, e.clientY);
                   }}
                 >
                   {columns.map(column => (
@@ -372,7 +435,7 @@ function GenericTable<T extends Record<string, any>>({
                         onContextMenu={(e) => {
                           e.stopPropagation();
                           e.preventDefault();
-                          setActiveRowMenu(rowIndex);
+                          openRowMenuAtPointer(rowIndex, e.clientX, e.clientY);
                         }}
                         ref={(el) => {
                           rowMenuRefs.current[rowIndex] = el;
@@ -390,30 +453,6 @@ function GenericTable<T extends Record<string, any>>({
                           <img src="/media/icons/vertical-three-dots.svg" alt="" className={styles.iconImage} />
                         </button>
 
-                        {activeRowMenu === rowIndex && (
-                          <div 
-                            className={styles.rowMenuDropdown}
-                            role="menu"
-                          >
-                            {rowActions.map(action => (
-                              <button
-                                key={action.id}
-                                className={`${styles.rowMenuItem} ${action.className || ''}`}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  action.onClick(row, rowIndex);
-                                  setActiveRowMenu(null);
-                                }}
-                                role="menuitem"
-                              >
-                                {action.icon && (
-                                  <span className={styles.rowMenuItemIcon}>{action.icon}</span>
-                                )}
-                                <span className={styles.rowMenuItemLabel}>{action.label}</span>
-                              </button>
-                            ))}
-                          </div>
-                        )}
                       </div>
                     </td>
                   )}
@@ -430,6 +469,10 @@ function GenericTable<T extends Record<string, any>>({
           className={styles.filterDropdown}
           role="dialog"
           aria-label="User table filters"
+          style={{
+            top: `${filterDropdownPosition.top}px`,
+            left: `${filterDropdownPosition.left}px`,
+          }}
         >
           <div className={styles.filterDropdownHeader}>
             <span className={styles.filterDropdownTitle}>Filter Users</span>
@@ -502,6 +545,32 @@ function GenericTable<T extends Record<string, any>>({
               Filter
             </button>
           </div>
+        </div>
+      )}
+
+      {activeRowMenu !== null && rowActions.length > 0 && sortedData[activeRowMenu] && (
+        <div
+          className={styles.rowMenuDropdown}
+          role="menu"
+          style={{
+            top: `${rowMenuPosition.top}px`,
+            left: `${rowMenuPosition.left}px`,
+          }}
+        >
+          {rowActions.map((action) => (
+            <button
+              key={action.id}
+              className={`${styles.rowMenuItem} ${action.className || ''}`}
+              onClick={() => {
+                action.onClick(sortedData[activeRowMenu], activeRowMenu);
+                setActiveRowMenu(null);
+              }}
+              role="menuitem"
+            >
+              {action.icon && <span className={styles.rowMenuItemIcon}>{action.icon}</span>}
+              <span className={styles.rowMenuItemLabel}>{action.label}</span>
+            </button>
+          ))}
         </div>
       )}
 
