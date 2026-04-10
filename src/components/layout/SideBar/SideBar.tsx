@@ -2,40 +2,12 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { 
-  FaBriefcase, 
-  FaHome, 
-  FaUsers, 
-  FaUserFriends, 
-  FaMoneyBillWave, 
-  FaHandshake, 
-  FaPiggyBank, 
-  FaHandHoldingUsd, 
-  FaUserCheck, 
-  FaUserTimes,
-  FaBuilding,
-  FaHandHolding,
-  FaUniversity,
-  FaCoins,
-  FaFileInvoiceDollar,
-  FaExchangeAlt,
-  FaTools,
-  FaUserCog,
-  FaScroll,
-  FaChartBar,
-  FaSlidersH,
-  FaPercent,
-  FaClipboardList,
-  FaTired,
-  FaSignOutAlt,
-  FaChevronDown
-} from 'react-icons/fa';
 import styles from './SideBar.module.scss';
 
 interface NavItem {
   id: string;
   label: string;
-  icon: React.ReactNode;
+  iconSrc: string;
   href?: string;
   active?: boolean;
 }
@@ -66,6 +38,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const organizations = ['Lendsqr HQ', 'Lendsqr Finance', 'Lendsqr Labs'];
   const pathname = usePathname();
+  const iconBasePath = '/media/icons';
 
   // Navigation sections data
   const sections: NavSection[] = [
@@ -74,14 +47,14 @@ const Sidebar: React.FC<SidebarProps> = ({
       label: 'CUSTOMERS',
       defaultExpanded: true,
       items: [
-        { id: 'users', label: 'Users', icon: <FaUserFriends />, href: '/dashboard/users' },
-        { id: 'guarantors', label: 'Guarantors', icon: <FaUsers />, href: '/dashboard/guarantors' },
-        { id: 'loans', label: 'Loans', icon: <FaMoneyBillWave />, href: '/dashboard/loans' },
-        { id: 'decision-models', label: 'Decision Models', icon: <FaHandshake />, href: '/dashboard/decision-models' },
-        { id: 'savings', label: 'Savings', icon: <FaPiggyBank />, href: '/dashboard/savings' },
-        { id: 'loan-requests', label: 'Loan Requests', icon: <FaHandHoldingUsd />, href: '/dashboard/loan-requests' },
-        { id: 'whitelist', label: 'Whitelist', icon: <FaUserCheck />, href: '/dashboard/whitelist' },
-        { id: 'karma', label: 'Karma', icon: <FaUserTimes />, href: '/dashboard/karma' },
+        { id: 'users', label: 'Users', iconSrc: `${iconBasePath}/user-friends.svg`, href: '/dashboard/users' },
+        { id: 'guarantors', label: 'Guarantors', iconSrc: `${iconBasePath}/users.svg`, href: '/dashboard/guarantors' },
+        { id: 'loans', label: 'Loans', iconSrc: `${iconBasePath}/sack.svg`, href: '/dashboard/loans' },
+        { id: 'decision-models', label: 'Decision Models', iconSrc: `${iconBasePath}/handshake-regular.svg`, href: '/dashboard/decision-models' },
+        { id: 'savings', label: 'Savings', iconSrc: `${iconBasePath}/piggy-bank.svg`, href: '/dashboard/savings' },
+        { id: 'loan-requests', label: 'Loan Requests', iconSrc: `${iconBasePath}/Group.svg`, href: '/dashboard/loan-requests' },
+        { id: 'whitelist', label: 'Whitelist', iconSrc: `${iconBasePath}/user-check.svg`, href: '/dashboard/whitelist' },
+        { id: 'karma', label: 'Karma', iconSrc: `${iconBasePath}/user-times.svg`, href: '/dashboard/karma' },
       ],
     },
     {
@@ -89,15 +62,15 @@ const Sidebar: React.FC<SidebarProps> = ({
       label: 'BUSINESSES',
       defaultExpanded: true,
       items: [
-        { id: 'organization', label: 'Organization', icon: <FaBriefcase />, href: '/dashboard/organization' },
-        { id: 'loan-products', label: 'Loan Products', icon: <FaHandHolding />, href: '/dashboard/loan-products' },
-        { id: 'savings-products', label: 'Savings Products', icon: <FaUniversity />, href: '/dashboard/savings-products' },
-        { id: 'fees-charges', label: 'Fees and Charges', icon: <FaCoins />, href: '/dashboard/fees-charges' },
-        { id: 'transactions', label: 'Transactions', icon: <FaExchangeAlt />, href: '/dashboard/transactions' },
-        { id: 'services', label: 'Services', icon: <FaTools />, href: '/dashboard/services' },
-        { id: 'service-account', label: 'Service Account', icon: <FaUserCog />, href: '/dashboard/service-account' },
-        { id: 'settlements', label: 'Settlements', icon: <FaScroll />, href: '/dashboard/settlements' },
-        { id: 'reports', label: 'Reports', icon: <FaChartBar />, href: '/dashboard/reports' },
+        { id: 'organization', label: 'Organization', iconSrc: `${iconBasePath}/briefcase.svg`, href: '/dashboard/organization' },
+        { id: 'loan-products', label: 'Loan Products', iconSrc: `${iconBasePath}/sack.svg`, href: '/dashboard/loan-products' },
+        { id: 'savings-products', label: 'Savings Products', iconSrc: `${iconBasePath}/np_bank.svg`, href: '/dashboard/savings-products' },
+        { id: 'fees-charges', label: 'Fees and Charges', iconSrc: `${iconBasePath}/coins-solid.svg`, href: '/dashboard/fees-charges' },
+        { id: 'transactions', label: 'Transactions', iconSrc: `${iconBasePath}/icon.svg`, href: '/dashboard/transactions' },
+        { id: 'services', label: 'Services', iconSrc: `${iconBasePath}/galaxy.svg`, href: '/dashboard/services' },
+        { id: 'service-account', label: 'Service Account', iconSrc: `${iconBasePath}/user-cog.svg`, href: '/dashboard/service-account' },
+        { id: 'settlements', label: 'Settlements', iconSrc: `${iconBasePath}/scroll.svg`, href: '/dashboard/settlements' },
+        { id: 'reports', label: 'Reports', iconSrc: `${iconBasePath}/chart-bar.svg`, href: '/dashboard/reports' },
       ],
     },
     {
@@ -105,10 +78,10 @@ const Sidebar: React.FC<SidebarProps> = ({
       label: 'SETTINGS',
       defaultExpanded: true,
       items: [
-        { id: 'preferences', label: 'Preferences', icon: <FaSlidersH />, href: '/dashboard/preferences' },
-        { id: 'fees-pricing', label: 'Fees and Pricing', icon: <FaPercent />, href: '/dashboard/fees-pricing' },
-        { id: 'audit-logs', label: 'Audit Logs', icon: <FaClipboardList />, href: '/dashboard/audit-logs' },
-        { id: 'systems-messages', label: 'Systems Messages', icon: <FaTired />, href: '/dashboard/systems-messages' },
+        { id: 'preferences', label: 'Preferences', iconSrc: `${iconBasePath}/sliders.svg`, href: '/dashboard/preferences' },
+        { id: 'fees-pricing', label: 'Fees and Pricing', iconSrc: `${iconBasePath}/badge-percent.svg`, href: '/dashboard/fees-pricing' },
+        { id: 'audit-logs', label: 'Audit Logs', iconSrc: `${iconBasePath}/clipboard-list.svg`, href: '/dashboard/audit-logs' },
+        { id: 'systems-messages', label: 'Systems Messages', iconSrc: `${iconBasePath}/bell.svg`, href: '/dashboard/systems-messages' },
       ],
     },
   ];
@@ -239,7 +212,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               {/* Switch Organization */}
               <div className={styles.switchOrg}>
                 <button 
-                  className={styles.switchOrgButton}
+                  className={`${styles.navLink} ${styles.switchOrgButton}`}
                   type="button"
                   onClick={() => {
                     setIsOrganizationListOpen((prev) => !prev);
@@ -249,12 +222,12 @@ const Sidebar: React.FC<SidebarProps> = ({
                   aria-expanded={isOrganizationListOpen}
                   aria-controls="organization-list"
                 >
-                  <span className={styles.switchOrgIcon}>
-                    <FaBriefcase />
+                  <span className={styles.navIcon}>
+                    <img src={`${iconBasePath}/briefcase.svg`} alt="" className={styles.iconImage} />
                   </span>
-                  <span className={styles.switchOrgText}>Switch Organization</span>
+                  <span className={styles.navLabel}>Switch Organization</span>
                   <span className={`${styles.switchOrgChevron} ${isOrganizationListOpen ? styles.switchOrgChevronOpen : ''}`}>
-                    <FaChevronDown />
+                    <img src={`${iconBasePath}/chevron-down-thin.svg`} alt="" className={styles.chevronIcon} />
                   </span>
                 </button>
 
@@ -287,19 +260,21 @@ const Sidebar: React.FC<SidebarProps> = ({
               <div className={styles.dashboard}>
                 <a 
                   href="/dashboard" 
-                  className={`${styles.dashboardLink} ${isDashboardActive ? styles.dashboardLinkActive : ''}`}
+                  className={`${styles.navLink} ${isDashboardActive ? styles.navLinkActive : ''}`}
                   onClick={(e) => {
-                    handleNavigate({ id: 'dashboard', label: 'Dashboard', icon: <FaHome />, href: '/dashboard' });
+                    handleNavigate({ id: 'dashboard', label: 'Dashboard', iconSrc: `${iconBasePath}/home.svg`, href: '/dashboard' });
                     if (onNavigate) {
                       e.preventDefault();
                     }
                   }}
                   aria-current={isDashboardActive ? 'page' : undefined}
                 >
-                  <span className={styles.dashboardIcon}>
-                    <FaHome />
+                  {isDashboardActive && <span className={styles.activeStripe} aria-hidden="true" />}
+                  {isDashboardActive && <span className={styles.activeBackground} aria-hidden="true" />}
+                  <span className={`${styles.navIcon} ${isDashboardActive ? styles.navIconActive : ''}`}>
+                    <img src={`${iconBasePath}/home.svg`} alt="" className={styles.iconImage} />
                   </span>
-                  <span className={styles.dashboardText}>Dashboard</span>
+                  <span className={`${styles.navLabel} ${isDashboardActive ? styles.navLabelActive : ''}`}>Dashboard</span>
                 </a>
               </div>
 
@@ -347,7 +322,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                                 {isActive && <span className={styles.activeBackground} aria-hidden="true" />}
                                 
                                 <span className={`${styles.navIcon} ${isActive ? styles.navIconActive : ''}`}>
-                                  {item.icon}
+                                  <img src={item.iconSrc} alt="" className={styles.iconImage} />
                                 </span>
                                 <span className={`${styles.navLabel} ${isActive ? styles.navLabelActive : ''}`}>
                                   {item.label}
@@ -369,12 +344,12 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className={styles.divider} role="separator" />
 
             <button
-              className={styles.logoutButton}
+              className={styles.navLink}
               onClick={onLogout}
               aria-label="Logout"
             >
               <span className={styles.logoutIcon}>
-                <FaSignOutAlt />
+                <img src={`${iconBasePath}/sign-out.svg`} alt="" className={styles.iconImage} />
               </span>
               <span className={styles.logoutText}>Logout</span>
             </button>

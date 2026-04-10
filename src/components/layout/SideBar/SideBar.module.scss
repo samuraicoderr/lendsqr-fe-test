@@ -1,8 +1,8 @@
 // Design Tokens - Exact values from Figma
-$color-primary: #213F7D;
-$color-accent: #39CDCC;
-$color-text-secondary: #545F7D;
-$color-white: #FFFFFF;
+$color-primary: #213f7d;
+$color-accent: #39cdcc;
+$color-text-secondary: #545f7d;
+$color-white: #ffffff;
 $color-border: rgba(33, 63, 125, 0.1);
 $color-active-bg: rgba(57, 205, 204, 0.06);
 
@@ -13,7 +13,12 @@ $item-height: 40px;
 $stripe-width: 3px;
 
 // Typography - Exact from Figma
-$font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+$font-family:
+  "Work Sans",
+  -apple-system,
+  BlinkMacSystemFont,
+  "Segoe UI",
+  sans-serif;
 $font-size-label: 12px;
 $font-size-nav: 16px;
 $font-size-version: 12px;
@@ -61,7 +66,7 @@ $breakpoint-desktop: 1024px;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(2px);
-  z-index: 998;
+  z-index: 2500;
   animation: fadeIn $transition-base;
 
   @media (min-width: $breakpoint-desktop) {
@@ -78,11 +83,10 @@ $breakpoint-desktop: 1024px;
   height: 100vh;
   background: $color-white;
   box-shadow: $shadow-sidebar;
-  z-index: 999;
+  z-index: 3000;
   transform: translateX(-100%);
   transition: transform $transition-base;
-  top: 70px;
-  
+
   @media (min-width: $breakpoint-desktop) {
     top: 100px;
     position: fixed;
@@ -120,7 +124,7 @@ $breakpoint-desktop: 1024px;
 }
 
 .content {
-  padding-bottom: 140px;
+  padding-bottom: 24px;
 }
 
 // Switch Organization
@@ -128,30 +132,10 @@ $breakpoint-desktop: 1024px;
   padding: 20px 0;
 }
 
-.switchOrgButton {
+.switchOrgButton,.footer button {
   border: none;
   cursor: pointer;
-}
-
-.switchOrgIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: $icon-size;
-  height: $icon-size;
-  color: $color-primary;
-  opacity: 0.6;
-  font-size: 14px;
-
-  svg {
-    width: 100%;
-    height: 100%;
-  }
-}
-
-.switchOrgText {
-  flex: 1;
-  text-align: left;
+  background-color: white;
 }
 
 .switchOrgChevron {
@@ -160,8 +144,7 @@ $breakpoint-desktop: 1024px;
   justify-content: center;
   width: 14px;
   height: 14px;
-  color: $color-primary;
-  font-size: 12px;
+  margin-left: auto;
   transform: rotate(0deg);
   transition: transform $transition-fast;
 }
@@ -178,7 +161,9 @@ $breakpoint-desktop: 1024px;
   flex-direction: column;
   gap: 4px;
   margin: 8px $padding-horizontal 0;
-  transition: max-height $transition-base, opacity $transition-fast;
+  transition:
+    max-height $transition-base,
+    opacity $transition-fast;
 }
 
 .organizationListOpen {
@@ -198,7 +183,9 @@ $breakpoint-desktop: 1024px;
   border-radius: 8px;
   padding: 8px 12px;
   cursor: pointer;
-  transition: background $transition-fast, color $transition-fast;
+  transition:
+    background $transition-fast,
+    color $transition-fast;
 
   &:hover {
     background: rgba($color-accent, 0.08);
@@ -222,58 +209,15 @@ $breakpoint-desktop: 1024px;
   font-size: 12px;
 }
 
+.chevronIcon {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
 // Dashboard
 .dashboard {
   margin-bottom: 10px;
-}
-
-.dashboardLink,
-.switchOrgButton {
-  @include nav-item-base;
-  color: $color-primary;
-  opacity: 0.6;
-  font-family: $font-family;
-  font-size: $font-size-nav;
-  font-weight: $font-weight-regular;
-  line-height: $line-height-nav;
-  gap: $icon-margin;
-  border-radius: 8px;
-  margin: 0 $padding-horizontal;
-  width: calc(100% - #{$padding-horizontal * 2});
-  justify-content: flex-start;
-
-  &:hover {
-    opacity: 1;
-    background: rgba($color-accent, 0.05);
-  }
-
-  &:focus-visible {
-    @include focus-ring;
-    opacity: 1;
-  }
-}
-
-.dashboardIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: $icon-size;
-  height: $icon-size;
-  font-size: 14px;
-
-  svg {
-    width: 100%;
-    height: 100%;
-  }
-}
-
-.dashboardText {
-  flex: 1;
-}
-
-.dashboardLinkActive {
-  opacity: 1;
-  background: $color-active-bg;
 }
 
 // Navigation Sections
@@ -326,7 +270,9 @@ $breakpoint-desktop: 1024px;
 .sectionContent {
   max-height: 0;
   overflow: hidden;
-  transition: max-height $transition-slow ease-in-out, opacity $transition-base;
+  transition:
+    max-height $transition-slow ease-in-out,
+    opacity $transition-base;
   opacity: 0;
 
   &.sectionContentOpen {
@@ -409,10 +355,13 @@ $breakpoint-desktop: 1024px;
   color: $color-primary;
   opacity: 0.6;
   transition: opacity $transition-fast;
+  flex-shrink: 0;
 
-  svg {
+  svg,
+  img {
     width: 100%;
     height: 100%;
+    object-fit: contain;
   }
 
   &.navIconActive {
@@ -425,6 +374,7 @@ $breakpoint-desktop: 1024px;
   z-index: 1;
   position: relative;
   transition: color $transition-fast;
+  flex: 1;
 
   &.navLabelActive {
     color: $color-primary;
@@ -432,15 +382,21 @@ $breakpoint-desktop: 1024px;
   }
 }
 
+.iconImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 // Footer
 .footer {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  position: relative;
+  margin-top: auto;
+  flex-shrink: 0;
   background: $color-white;
   padding: 16px 0;
-  z-index: 10;
+  z-index: 2;
 }
 
 .divider {
@@ -469,7 +425,7 @@ $breakpoint-desktop: 1024px;
   width: calc(100% - #{$padding-horizontal * 2});
 
   &:hover {
-    color: #E4033B;
+    color: #e4033b;
     background: rgba(228, 3, 59, 0.05);
   }
 
