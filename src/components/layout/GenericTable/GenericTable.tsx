@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   FaCalendarAlt,
   FaChevronDown,
   FaTimes
 } from 'react-icons/fa';
 import { Tooltip } from 'react-tooltip';
+import { createPopper, type Instance as PopperInstance, type Placement } from '@popperjs/core';
 import styles from './GenericTable.module.scss';
 
 // ============================================
@@ -164,14 +166,15 @@ function GenericTable<T extends Record<string, any>>({
 
   // State
   const [activeFilterColumn, setActiveFilterColumn] = useState<string | null>(null);
+  const [activeFilterButtonIndex, setActiveFilterButtonIndex] = useState<number | null>(null);
   const [filterValues, setFilterValues] = useState<FilterValues>({});
   const [activeRowMenu, setActiveRowMenu] = useState<number | null>(null);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
-  const [filterDropdownPosition, setFilterDropdownPosition] = useState<{ top: number; left: number }>({ top: 80, left: 20 });
   const [rowMenuPosition, setRowMenuPosition] = useState<{ top: number; left: number }>({ top: 80, left: 20 });
 
   // Refs
   const filterDropdownRef = useRef<HTMLDivElement>(null);
+  const popperInstanceRef = useRef<PopperInstance | null>(null);
   const rowMenuRefs = useRef<(HTMLDivElement | null)[]>([]);
   const filterButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -186,6 +189,7 @@ function GenericTable<T extends Record<string, any>>({
         !filterButtonRefs.current.some(ref => ref?.contains(event.target as Node))
       ) {
         setActiveFilterColumn(null);
+        setActiveFilterButtonIndex(null);
       }
 
       // Close row menu
@@ -211,6 +215,7 @@ function GenericTable<T extends Record<string, any>>({
   const handleApplyFilters = useCallback(() => {
     onFilter?.(filterValues);
     setActiveFilterColumn(null);
+    setActiveFilterButtonIndex(null);
   }, [filterValues, onFilter]);
 
   // Reset filters
@@ -218,26 +223,23 @@ function GenericTable<T extends Record<string, any>>({
     setFilterValues({});
     onReset?.();
     setActiveFilterColumn(null);
+    setActiveFilterButtonIndex(null);
   }, [onReset]);
 
   // Toggle filter dropdown
   const toggleFilterDropdown = useCallback((columnKey: string, buttonIndex: number) => {
-    setActiveFilterColumn(prev => prev === columnKey ? null : columnKey);
-    const button = filterButtonRefs.current[buttonIndex];
-    if (button) {
-      const rect = button.getBoundingClientRect();
-      const desiredLeft = rect.left + rect.width - FILTER_DROPDOWN_WIDTH;
-      const viewportPadding = 12;
-      const maxLeft = window.innerWidth - FILTER_DROPDOWN_WIDTH - viewportPadding;
-      const safeLeft = Math.max(viewportPadding, Math.min(desiredLeft, maxLeft));
+    const isSameColumn = activeFilterColumn === columnKey;
 
-      setFilterDropdownPosition({
-        top: rect.bottom + 10,
-        left: safeLeft,
-      });
+    if (isSameColumn) {
+      setActiveFilterColumn(null);
+      setActiveFilterButtonIndex(null);
+    } else {
+      setActiveFilterColumn(columnKey);
+      setActiveFilterButtonIndex(buttonIndex);
     }
+
     setActiveRowMenu(null);
-  }, []);
+  }, [activeFilterColumn]);
 
   // Toggle row menu
   const toggleRowMenu = useCallback((index: number) => {
@@ -288,13 +290,66 @@ function GenericTable<T extends Record<string, any>>({
   const isFilterDropdownOpen = activeFilterColumn !== null;
 
   useEffect(() => {
+    if (!isFilterDropdownOpen || activeFilterButtonIndex === null) {
+      return;
+    }
+
+    const referenceEl = filterButtonRefs.current[activeFilterButtonIndex];
+    const dropdownEl = filterDropdownRef.current;
+
+    if (!referenceEl || !dropdownEl) {
+      return;
+    }
+
+    const isSmallViewport = window.matchMedia('(max-width: 768px)').matches;
+    const placement: Placement = isSmallViewport ? 'bottom' : 'bottom-end';
+
+    popperInstanceRef.current?.destroy();
+    popperInstanceRef.current = createPopper(referenceEl, dropdownEl, {
+      placement,
+      strategy: 'fixed',
+      modifiers: [
+        {
+          name: 'offset',
+          options: {
+            offset: [0, 10],
+          },
+        },
+        {
+          name: 'flip',
+          options: {
+            padding: 12,
+            fallbackPlacements: ['top-end', 'bottom-start', 'top-start', 'bottom'],
+          },
+        },
+        {
+          name: 'preventOverflow',
+          options: {
+            padding: 12,
+            altAxis: true,
+            tether: true,
+          },
+        },
+      ],
+    });
+
+    return () => {
+      popperInstanceRef.current?.destroy();
+      popperInstanceRef.current = null;
+    };
+  }, [isFilterDropdownOpen, activeFilterButtonIndex]);
+
+  useEffect(() => {
     if (!isFilterDropdownOpen && activeRowMenu === null) {
       return;
     }
 
     const closeMenus = () => {
       setActiveFilterColumn(null);
+      setActiveFilterButtonIndex(null);
       setActiveRowMenu(null);
+      popperInstanceRef.current?.destroy();
+      popperInstanceRef.current = null;
     };
 
     window.addEventListener('resize', closeMenus);
@@ -327,6 +382,93 @@ function GenericTable<T extends Record<string, any>>({
     }
     return value;
   };
+
+  const filterDropdown = isFilterDropdownOpen ? (
+    <div
+      ref={filterDropdownRef}
+      className={styles.filterDropdown}
+      role="dialog"
+      aria-label="User table filters"
+      style={{
+        width: `${FILTER_DROPDOWN_WIDTH}px`,
+      }}
+    >
+      <div className={styles.filterDropdownHeader}>
+        <span className={styles.filterDropdownTitle}>Filter Users</span>
+        <button
+          className={styles.filterCloseButton}
+          onClick={() => {
+            setActiveFilterColumn(null);
+            setActiveFilterButtonIndex(null);
+          }}
+          aria-label="Close filter"
+        >
+          <FaTimes />
+        </button>
+      </div>
+
+      <div className={styles.filterDropdownContent}>
+        {filters.map((filter) => (
+          <div key={filter.key} className={styles.filterFieldGroup}>
+            <label className={styles.filterLabel}>{filter.label}</label>
+            {filter.type === 'select' ? (
+              <div className={styles.filterSelectWrapper}>
+                <select
+                  className={styles.filterSelect}
+                  value={filterValues[filter.key] || ''}
+                  onChange={(e) => handleFilterChange(filter.key, e.target.value)}
+                >
+                  <option value="">Select {filter.label}</option>
+                  {filter.options?.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <FaChevronDown className={styles.filterSelectIcon} />
+              </div>
+            ) : filter.type === 'date' ? (
+              <div className={styles.filterInputWrapper}>
+                <input
+                  type="date"
+                  className={styles.filterInput}
+                  placeholder={filter.placeholder || `Enter ${filter.label}`}
+                  value={filterValues[filter.key] || ''}
+                  onChange={(e) => handleFilterChange(filter.key, e.target.value)}
+                />
+                <FaCalendarAlt className={styles.filterInputIcon} />
+              </div>
+            ) : (
+              <input
+                type={
+                  filter.type === 'number'
+                    ? 'number'
+                    : filter.type === 'email'
+                      ? 'email'
+                      : filter.type === 'phone'
+                        ? 'tel'
+                        : 'text'
+                }
+                className={styles.filterInput}
+                placeholder={filter.placeholder || `Enter ${filter.label}`}
+                value={filterValues[filter.key] || ''}
+                onChange={(e) => handleFilterChange(filter.key, e.target.value)}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className={styles.filterDropdownFooter}>
+        <button className={styles.filterResetButton} onClick={handleResetFilters}>
+          Reset
+        </button>
+        <button className={styles.filterApplyButton} onClick={handleApplyFilters}>
+          Filter
+        </button>
+      </div>
+    </div>
+  ) : null;
 
   return (
     <div className={`${styles.tableContainer} ${className}`} style={{ maxHeight }}>
@@ -463,90 +605,7 @@ function GenericTable<T extends Record<string, any>>({
         </table>
       </div>
 
-      {isFilterDropdownOpen && (
-        <div
-          ref={filterDropdownRef}
-          className={styles.filterDropdown}
-          role="dialog"
-          aria-label="User table filters"
-          style={{
-            top: `${filterDropdownPosition.top}px`,
-            left: `${filterDropdownPosition.left}px`,
-          }}
-        >
-          <div className={styles.filterDropdownHeader}>
-            <span className={styles.filterDropdownTitle}>Filter Users</span>
-            <button
-              className={styles.filterCloseButton}
-              onClick={() => setActiveFilterColumn(null)}
-              aria-label="Close filter"
-            >
-              <FaTimes />
-            </button>
-          </div>
-
-          <div className={styles.filterDropdownContent}>
-            {filters.map((filter) => (
-              <div key={filter.key} className={styles.filterFieldGroup}>
-                <label className={styles.filterLabel}>{filter.label}</label>
-                {filter.type === 'select' ? (
-                  <div className={styles.filterSelectWrapper}>
-                    <select
-                      className={styles.filterSelect}
-                      value={filterValues[filter.key] || ''}
-                      onChange={(e) => handleFilterChange(filter.key, e.target.value)}
-                    >
-                      <option value="">Select {filter.label}</option>
-                      {filter.options?.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                    <FaChevronDown className={styles.filterSelectIcon} />
-                  </div>
-                ) : filter.type === 'date' ? (
-                  <div className={styles.filterInputWrapper}>
-                    <input
-                      type="date"
-                      className={styles.filterInput}
-                      placeholder={filter.placeholder || `Enter ${filter.label}`}
-                      value={filterValues[filter.key] || ''}
-                      onChange={(e) => handleFilterChange(filter.key, e.target.value)}
-                    />
-                    <FaCalendarAlt className={styles.filterInputIcon} />
-                  </div>
-                ) : (
-                  <input
-                    type={
-                      filter.type === 'number'
-                        ? 'number'
-                        : filter.type === 'email'
-                          ? 'email'
-                          : filter.type === 'phone'
-                            ? 'tel'
-                            : 'text'
-                    }
-                    className={styles.filterInput}
-                    placeholder={filter.placeholder || `Enter ${filter.label}`}
-                    value={filterValues[filter.key] || ''}
-                    onChange={(e) => handleFilterChange(filter.key, e.target.value)}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-
-          <div className={styles.filterDropdownFooter}>
-            <button className={styles.filterResetButton} onClick={handleResetFilters}>
-              Reset
-            </button>
-            <button className={styles.filterApplyButton} onClick={handleApplyFilters}>
-              Filter
-            </button>
-          </div>
-        </div>
-      )}
+      {typeof document !== 'undefined' ? createPortal(filterDropdown, document.body) : filterDropdown}
 
       {activeRowMenu !== null && rowActions.length > 0 && sortedData[activeRowMenu] && (
         <div

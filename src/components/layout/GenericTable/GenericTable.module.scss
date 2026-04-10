@@ -238,6 +238,7 @@ $radius-dropdown: 4px;
 .filterDropdown {
   position: fixed;
   width: 320px;
+  max-width: calc(100vw - 24px);
   max-height: 80vh;
   overflow-y: auto;
   background: $color-white;
