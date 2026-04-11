@@ -340,26 +340,22 @@ function GenericTable<T extends Record<string, any>>({
   }, [isFilterDropdownOpen, activeFilterButtonIndex]);
 
   useEffect(() => {
-    if (!isFilterDropdownOpen && activeRowMenu === null) {
+    if (activeRowMenu === null) {
       return;
     }
 
-    const closeMenus = () => {
-      setActiveFilterColumn(null);
-      setActiveFilterButtonIndex(null);
+    const closeRowMenu = () => {
       setActiveRowMenu(null);
-      popperInstanceRef.current?.destroy();
-      popperInstanceRef.current = null;
     };
 
-    window.addEventListener('resize', closeMenus);
-    window.addEventListener('scroll', closeMenus, true);
+    window.addEventListener('resize', closeRowMenu);
+    window.addEventListener('scroll', closeRowMenu, true);
 
     return () => {
-      window.removeEventListener('resize', closeMenus);
-      window.removeEventListener('scroll', closeMenus, true);
+      window.removeEventListener('resize', closeRowMenu);
+      window.removeEventListener('scroll', closeRowMenu, true);
     };
-  }, [isFilterDropdownOpen, activeRowMenu]);
+  }, [activeRowMenu]);
 
   // Sort data
   const sortedData = useMemo(() => {
