@@ -1,0 +1,496 @@
+// Design Tokens
+$color-primary: #213F7D;
+$color-secondary: #545F7D;
+$color-accent: #39CDCC;
+$color-danger: #E4033B;
+$color-star: #E9B200;
+$color-white: #FFFFFF;
+$color-border: rgba(33, 63, 125, 0.06);
+$color-divider: rgba(33, 63, 125, 0.1);
+
+$font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+$font-family-alt: 'SF Compact Text', -apple-system, BlinkMacSystemFont, sans-serif;
+
+// Dimensions
+$container-width: 1537px;
+$profile-card-height: 210px;
+$details-card-min-height: 910px;
+$avatar-size: 100px;
+$button-height: 40px;
+
+// Typography
+$font-size-page-title: 24px;
+$font-size-username: 22px;
+$font-size-section-title: 16px;
+$font-size-info-label: 12px;
+$font-size-info-value: 16px;
+$font-size-balance: 22px;
+$font-size-tab: 16px;
+$font-size-button: 14px;
+
+// Shadows
+$shadow-card: 3px 5px 20px rgba(0, 0, 0, 0.04);
+
+// Transitions
+$transition-fast: 150ms ease;
+
+.container {
+  width: 100%;
+  max-width: $container-width;
+  padding-bottom: 40px;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 30px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 20px;
+  }
+}
+
+// Back Button
+.backButton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $color-secondary;
+  font-family: $font-family;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 19px;
+  margin-bottom: 20px;
+  padding: 0;
+  
+  &:hover {
+    color: $color-primary;
+  }
+}
+
+.backIcon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+// Page Title
+.pageTitle {
+  font-family: $font-family;
+  font-size: $font-size-page-title;
+  font-weight: 500;
+  line-height: 28px;
+  color: $color-primary;
+  margin: 0;
+}
+
+// Action Buttons
+.actionButtons {
+  display: flex;
+  gap: 20px;
+  
+  @media (max-width: 768px) {
+    margin-bottom: 0;
+    flex-direction: column;
+  }
+}
+
+.blacklistButton,
+.activateButton {
+  width: 170px;
+  height: $button-height;
+  border-radius: 8px;
+  font-family: $font-family;
+  font-size: $font-size-button;
+  font-weight: 600;
+  line-height: 16px;
+  text-align: center;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all $transition-fast;
+}
+
+.blacklistButton {
+  background: transparent;
+  border: 1px solid $color-danger;
+  color: $color-danger;
+  
+  &:hover {
+    background: rgba($color-danger, 0.05);
+  }
+}
+
+.activateButton {
+  background: transparent;
+  border: 1px solid $color-accent;
+  color: $color-accent;
+  
+  &:hover {
+    background: rgba($color-accent, 0.05);
+  }
+}
+
+// Profile Card
+.profileCard {
+  background: $color-white;
+  border: 1px solid $color-border;
+  box-shadow: $shadow-card;
+  border-radius: 4px;
+  margin-bottom: 30px;
+  overflow: hidden;
+}
+
+.profileHeader {
+  display: flex;
+  align-items: center;
+  padding: 30px 30px 0;
+  gap: 20px;
+  flex-wrap: wrap;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+.avatar {
+  flex-shrink: 0;
+}
+
+.avatarPlaceholder {
+  width: $avatar-size;
+  height: $avatar-size;
+  background: rgba($color-primary, 0.16);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatarIcon {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+}
+
+.nameSection {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.userName {
+  font-family: $font-family;
+  font-size: $font-size-username;
+  font-weight: 500;
+  line-height: 26px;
+  color: $color-primary;
+  margin: 0;
+}
+
+.userId {
+  font-family: $font-family;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 16px;
+  color: $color-secondary;
+}
+
+.divider {
+  width: 80px;
+  height: 0;
+  border: 1px solid $color-secondary;
+  opacity: 0.2;
+  transform: rotate(90deg);
+  margin: 0 10px;
+  
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.tierSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tierLabel {
+  font-family: $font-family;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 16px;
+  color: $color-secondary;
+}
+
+.stars {
+  display: flex;
+  gap: 4px;
+}
+
+.starFilled {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.starEmpty {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.balanceSection {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.balance {
+  font-family: $font-family;
+  font-size: $font-size-balance;
+  font-weight: 500;
+  line-height: 26px;
+  color: $color-primary;
+}
+
+.account {
+  font-family: $font-family;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 14px;
+  color: $color-primary;
+}
+
+// Tabs
+.tabs {
+  display: flex;
+  gap: 0;
+  margin-top: 30px;
+  padding: 0 30px;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.tab {
+  position: relative;
+  padding: 12px 25px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: $font-family-alt;
+  font-size: $font-size-tab;
+  font-weight: 400;
+  line-height: 19px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+  transition: color $transition-fast;
+  
+  &:hover {
+    color: $color-accent;
+  }
+}
+
+.tabActive {
+  color: $color-accent;
+}
+
+.tabIndicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: $color-accent;
+}
+
+// Details Card
+.detailsCard {
+  background: $color-white;
+  border: 1px solid $color-border;
+  box-shadow: $shadow-card;
+  border-radius: 4px;
+  padding: 30px;
+  min-height: $details-card-min-height;
+}
+
+.section {
+  margin-bottom: 10px;
+}
+
+.sectionTitle {
+  font-family: $font-family;
+  font-size: $font-size-section-title;
+  font-weight: 500;
+  line-height: 19px;
+  color: $color-primary;
+  margin: 0 0 25px 0;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 30px 20px;
+  
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.infoLabel {
+  font-family: $font-family;
+  font-size: $font-size-info-label;
+  font-weight: 400;
+  line-height: 14px;
+  text-transform: uppercase;
+  color: $color-secondary;
+}
+
+.infoValue {
+  font-family: $font-family;
+  font-size: $font-size-info-value;
+  font-weight: 500;
+  line-height: 19px;
+  color: $color-secondary;
+  word-break: break-word;
+}
+
+.sectionDivider {
+  height: 0;
+  border: 1px solid $color-divider;
+  opacity: 0.1;
+  margin: 25px 0;
+}
+
+// Skeleton Loading
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.skeletonHeader,
+.skeletonCard,
+.skeletonContent {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeletonHeader {
+  height: 30px;
+  width: 200px;
+}
+
+.skeletonCard {
+  height: $profile-card-height;
+}
+
+.skeletonContent {
+  height: 400px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+// Error State
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 16px;
+  color: $color-secondary;
+  font-family: $font-family;
+  
+  button {
+    padding: 12px 24px;
+    background: $color-primary;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: $font-family;
+    font-weight: 500;
+    
+    &:hover {
+      background: darken($color-primary, 5%);
+    }
+  }
+}
+
+// Reduced motion
+@media (prefers-reduced-motion: reduce) {
+  .skeletonHeader,
+  .skeletonCard,
+  .skeletonContent {
+    animation: none;
+  }
+}
+
+.tabCardsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tabCard {
+  border: 1px solid $color-divider;
+  border-radius: 8px;
+  padding: 16px;
+  background: rgba($color-primary, 0.02);
+}
+
+.tabCardTitle {
+  margin: 0 0 8px;
+  font-family: $font-family;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+  color: $color-primary;
+}
+
+.tabCardMeta {
+  margin: 0;
+  font-family: $font-family;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+  color: $color-secondary;
+}

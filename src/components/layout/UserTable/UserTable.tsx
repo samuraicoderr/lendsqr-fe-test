@@ -243,6 +243,7 @@ export default function UserTable() {
 				label: "View Details",
 				icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />,
 				onClick: (row: UserRecord) => {
+                    console.log(`/dashboard/users/${row.id}`);
 					router.push(`/dashboard/users/${row.id}`);
 				},
 			},
