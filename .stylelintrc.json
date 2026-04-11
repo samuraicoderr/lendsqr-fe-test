@@ -1,0 +1,12 @@
+{
+  "extends": "stylelint-config-standard-scss",
+  "plugins": ["stylelint-scss"],
+  "rules": {
+    "scss/no-undefined-variable": true,
+    "scss/at-use-no-unnamespaced": true,
+    "scss/load-no-partial-leading-underscore": true,
+
+    "no-duplicate-selectors": true,
+    "block-no-empty": true
+  }
+}

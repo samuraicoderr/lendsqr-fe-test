@@ -11,6 +11,13 @@ build:
 	npm run build
 
 
+lint:
+	npm run lint
+
+lint-scss:
+	npm run lint:scss
+
+
 diff-staged:
 	git diff --cached > ./a.diff
 	code ./a.diff

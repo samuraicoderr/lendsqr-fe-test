@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "lint:scss": "stylelint \"src/**/*.{scss,sass}\""
   },
   "dependencies": {
     "@fortawesome/react-fontawesome": "^3.3.0",
@@ -27,6 +28,9 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.3",
     "jest": "^30.3.0",
+    "stylelint": "^17.6.0",
+    "stylelint-config-standard-scss": "^17.0.0",
+    "stylelint-scss": "^7.0.0",
     "typescript": "^5"
   }
 }
