@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import FrontendLinks from '@/lib/FrontendLinks';
+import Link from 'next/link';
 import styles from './UserDetails.module.scss';
 
 // Types
@@ -380,10 +382,10 @@ const UserDetails: React.FC<UserDetailsProps> = ({
   return (
     <div className={`${styles.container} ${className}`}>
       {/* Back Button */}
-      <button className={styles.backButton} onClick={onBack}>
+      <Link className={styles.backButton} href={FrontendLinks.users}>
         <img src="/media/icons/long-left-arrow.svg" alt="Back" className={styles.backIcon} />
         <span>Back to Users</span>
-      </button>
+      </Link>
 
       <div className={styles.headerRow}>
         <h1 className={styles.pageTitle}>User Details</h1>

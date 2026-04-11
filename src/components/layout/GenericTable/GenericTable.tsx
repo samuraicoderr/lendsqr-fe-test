@@ -181,6 +181,7 @@ function GenericTable<T extends Record<string, any>>({
   // Refs
   const filterDropdownRef = useRef<HTMLDivElement>(null);
   const popperInstanceRef = useRef<PopperInstance | null>(null);
+  const rowMenuDropdownRef = useRef<HTMLDivElement>(null);
   const rowMenuRefs = useRef<(HTMLDivElement | null)[]>([]);
   const filterButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -202,7 +203,8 @@ function GenericTable<T extends Record<string, any>>({
       if (
         activeRowMenu !== null &&
         rowMenuRefs.current[activeRowMenu] &&
-        !rowMenuRefs.current[activeRowMenu]?.contains(event.target as Node)
+        !rowMenuRefs.current[activeRowMenu]?.contains(event.target as Node) &&
+        !rowMenuDropdownRef.current?.contains(event.target as Node)
       ) {
         setActiveRowMenu(null);
       }
@@ -628,6 +630,7 @@ function GenericTable<T extends Record<string, any>>({
 
         {activeRowMenu !== null && rowActions.length > 0 && sortedData[activeRowMenu] && (
           <div
+            ref={rowMenuDropdownRef}
             className={styles.rowMenuDropdown}
             role="menu"
             style={{
