@@ -17,6 +17,8 @@ lint:
 lint-scss:
 	npm run lint:scss
 
+lint-scss+:
+	npm run scss:check
 
 diff-staged:
 	git diff --cached > ./a.diff
