@@ -42,7 +42,7 @@
 }
 
 :root {
-  --background: #ffffff;
+  --background: #fff;
   --foreground: #171717;
 
   // uses system to tell but overenginnering :)
@@ -54,8 +54,7 @@
 
 html {
   height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden auto;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE/Edge */
 
@@ -76,7 +75,7 @@ body {
   flex-direction: column;
   color: var(--foreground);
   background: var(--background);
-  font-family: "Avenir Next", "Avenir", "Segoe UI", sans-serif;
+  font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

@@ -1,6 +1,8 @@
+@use "../../styles/variables" as v;
+
 .dashboard {
   min-height: 100vh;
-  background: #fbfbfb;
+  background: v.$color-bg-muted;
 }
 
 .body {
@@ -11,7 +13,7 @@
   min-width: 0;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: v.$breakpoint-lg) {
   .content {
     margin-left: 283px;
   }

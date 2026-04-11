@@ -1,15 +1,17 @@
-// Design Tokens
-$color-primary: #213F7D;
-$color-secondary: #545F7D;
-$color-accent: #39CDCC;
-$color-danger: #E4033B;
-$color-star: #E9B200;
-$color-white: #FFFFFF;
-$color-border: rgba(33, 63, 125, 0.06);
-$color-divider: rgba(33, 63, 125, 0.1);
+@use "sass:color";
+@use "../../../styles/variables" as v;
 
-$font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-$font-family-alt: 'SF Compact Text', -apple-system, BlinkMacSystemFont, sans-serif;
+// Design Tokens
+$color-primary: v.$color-primary;
+$color-secondary: v.$color-secondary;
+$color-accent: v.$color-accent;
+$color-danger: v.$color-danger;
+$color-star: #E9B200;
+$color-white: v.$color-white;
+$color-border: v.$color-border;
+$color-divider: v.$color-divider;
+$font-family: v.$font-family-base;
+$font-family-alt: 'SF Compact Text', -apple-system, blinkmacsystemfont, sans-serif;
 
 // Dimensions
 $container-width: 1537px;
@@ -29,10 +31,10 @@ $font-size-tab: 16px;
 $font-size-button: 14px;
 
 // Shadows
-$shadow-card: 3px 5px 20px rgba(0, 0, 0, 0.04);
+$shadow-card: v.$shadow-md;
 
 // Transitions
-$transition-fast: 150ms ease;
+$transition-fast: v.$transition-fast;
 
 .container {
   width: 100%;
@@ -47,7 +49,7 @@ $transition-fast: 150ms ease;
   gap: 16px;
   margin-bottom: 30px;
 
-  @media (max-width: 768px) {
+  @media (width <= 768px) {
     flex-direction: column;
     align-items: stretch;
     margin-bottom: 20px;
@@ -97,7 +99,7 @@ $transition-fast: 150ms ease;
   display: flex;
   gap: 20px;
   
-  @media (max-width: 768px) {
+  @media (width <= 768px) {
     margin-bottom: 0;
     flex-direction: column;
   }
@@ -156,7 +158,7 @@ $transition-fast: 150ms ease;
   gap: 20px;
   flex-wrap: wrap;
   
-  @media (max-width: 768px) {
+  @media (width <= 768px) {
     flex-direction: column;
     text-align: center;
   }
@@ -213,7 +215,7 @@ $transition-fast: 150ms ease;
   transform: rotate(90deg);
   margin: 0 10px;
   
-  @media (max-width: 768px) {
+  @media (width <= 768px) {
     display: none;
   }
 }
@@ -293,7 +295,7 @@ $transition-fast: 150ms ease;
   font-weight: 400;
   line-height: 19px;
   text-align: center;
-  color: rgba(0, 0, 0, 0.8);
+  color: rgb(0 0 0 / 80%);
   white-space: nowrap;
   transition: color $transition-fast;
   
@@ -335,7 +337,7 @@ $transition-fast: 150ms ease;
   font-weight: 500;
   line-height: 19px;
   color: $color-primary;
-  margin: 0 0 25px 0;
+  margin: 0 0 25px;
 }
 
 .infoGrid {
@@ -343,15 +345,15 @@ $transition-fast: 150ms ease;
   grid-template-columns: repeat(5, 1fr);
   gap: 30px 20px;
   
-  @media (max-width: 1024px) {
+  @media (width <= 1024px) {
     grid-template-columns: repeat(3, 1fr);
   }
   
-  @media (max-width: 768px) {
+  @media (width <= 768px) {
     grid-template-columns: repeat(2, 1fr);
   }
   
-  @media (max-width: 480px) {
+  @media (width <= 480px) {
     grid-template-columns: 1fr;
   }
 }
@@ -377,7 +379,7 @@ $transition-fast: 150ms ease;
   font-weight: 500;
   line-height: 19px;
   color: $color-secondary;
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .sectionDivider {
@@ -443,7 +445,7 @@ $transition-fast: 150ms ease;
     font-weight: 500;
     
     &:hover {
-      background: darken($color-primary, 5%);
+      background: color.adjust($color-primary, $lightness: -5%);
     }
   }
 }
@@ -462,11 +464,11 @@ $transition-fast: 150ms ease;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
 
-  @media (max-width: 1024px) {
+  @media (width <= 1024px) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  @media (max-width: 640px) {
+  @media (width <= 640px) {
     grid-template-columns: 1fr;
   }
 }

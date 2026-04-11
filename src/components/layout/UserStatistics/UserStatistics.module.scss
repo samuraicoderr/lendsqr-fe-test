@@ -1,13 +1,15 @@
+@use "sass:color";
+@use "../../../styles/variables" as v;
+
 // UserStatistics.module.scss
 // Exact Figma specifications
 
 // Design Tokens
-$color-primary: #213F7D;
-$color-text-label: #545F7D;
-$color-white: #FFFFFF;
-$color-border: rgba(33, 63, 125, 0.06);
-
-$font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+$color-primary: v.$color-primary;
+$color-text-label: v.$color-secondary;
+$color-white: v.$color-white;
+$color-border: v.$color-border;
+$font-family: v.$font-family-base;
 
 // Exact dimensions from Figma analysis
 $card-width: 240px;
@@ -19,8 +21,8 @@ $icon-wrapper-size: 40px;
 // Typography
 $font-size-label: 14px;
 $font-size-value: 24px;
-$font-weight-label: 500;
-$font-weight-value: 600;
+$font-weight-label: v.$font-weight-medium;
+$font-weight-value: v.$font-weight-semibold;
 $line-height-label: 16px;
 $line-height-value: 28px;
 
@@ -28,10 +30,10 @@ $line-height-value: 28px;
 $gap: 26px;
 
 // Shadows
-$shadow-card: 3px 5px 20px rgba(0, 0, 0, 0.04);
+$shadow-card: 3px 5px 20px rgb(0 0 0 / 4%);
 
 // Transitions
-$transition-base: 200ms ease;
+$transition-base: v.$transition-base;
 
 .container {
   width: 100%;
@@ -42,11 +44,11 @@ $transition-base: 200ms ease;
   grid-template-columns: repeat(4, 1fr);
   gap: $gap;
   
-  @media (max-width: 1200px) {
+  @media (width <= 1200px) {
     grid-template-columns: repeat(2, 1fr);
   }
   
-  @media (max-width: 640px) {
+  @media (width <= 640px) {
     grid-template-columns: 1fr;
   }
 }
@@ -63,7 +65,7 @@ $transition-base: 200ms ease;
   
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 3px 8px 25px rgba(0, 0, 0, 0.08);
+    box-shadow: 3px 8px 25px rgb(0 0 0 / 8%);
   }
 }
 
@@ -88,7 +90,6 @@ $transition-base: 200ms ease;
   margin-bottom: 12px;
   font-family: $font-family;
   font-size: 14px;
-  font-weight: 500;
   line-height: 16px;
   color: #545F7D;
   text-transform: uppercase;
@@ -111,11 +112,11 @@ $transition-base: 200ms ease;
   grid-template-columns: repeat(4, 1fr);
   gap: $gap;
   
-  @media (max-width: 1200px) {
+  @media (width <= 1200px) {
     grid-template-columns: repeat(2, 1fr);
   }
   
-  @media (max-width: 640px) {
+  @media (width <= 640px) {
     grid-template-columns: 1fr;
   }
 }
@@ -162,6 +163,7 @@ $transition-base: 200ms ease;
   0% {
     background-position: 200% 0;
   }
+
   100% {
     background-position: -200% 0;
   }
@@ -189,7 +191,7 @@ $transition-base: 200ms ease;
     font-weight: 500;
     
     &:hover {
-      background: darken(#213F7D, 5%);
+      background: color.adjust(v.$color-primary, $lightness: -5%);
     }
   }
 }

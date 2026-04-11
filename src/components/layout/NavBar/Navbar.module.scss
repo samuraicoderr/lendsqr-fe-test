@@ -1,14 +1,17 @@
 
-// Design Tokens (Exact values from Figma)
-$color-primary: #213F7D;
-$color-accent: #39CDCC;
-$color-white: #FFFFFF;
-$color-text-secondary: #545F7D;
-$color-border: #213F7D;
-$color-avatar-bg: #C4C4C4;
+@use "sass:color";
+@use "../../../styles/variables" as v;
+@use "../../../styles/mixins" as m;
 
-$font-family-work-sans: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-$font-family-roboto: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+// Design Tokens (Exact values from Figma)
+$color-primary: v.$color-primary;
+$color-accent: v.$color-accent;
+$color-white: v.$color-white;
+$color-text-secondary: v.$color-secondary;
+$color-border: v.$color-primary;
+$color-avatar-bg: #C4C4C4;
+$font-family-work-sans: v.$font-family-base;
+$font-family-roboto: v.$font-family-alt;
 
 // Exact dimensions from Figma
 $navbar-height: 100px;
@@ -18,7 +21,7 @@ $search-height: 40px; // 30% to 70% of 100px
 $avatar-size: 48px; // 26% to 74% of 100px = 48px
 
 // Shadows
-$shadow-navbar: 3px 0px 20px rgba(0, 0, 0, 0.04);
+$shadow-navbar: 3px 0px 20px rgb(0 0 0 / 4%);
 
 // Spacing scale
 $space-xs: 4px;
@@ -28,25 +31,22 @@ $space-lg: 24px;
 $space-xl: 30px;
 
 // Transitions
-$transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-$transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-$transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-fast: v.$transition-fast;
+$transition-base: v.$transition-base;
+$transition-slow: v.$transition-slow;
 
 // Breakpoints
-$breakpoint-tablet: 768px;
-$breakpoint-desktop: 1024px;
+$breakpoint-tablet: v.$breakpoint-md;
+$breakpoint-desktop: v.$breakpoint-lg;
 $breakpoint-large: 1440px;
 
 // Mixins
 @mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include m.flex-center;
 }
 
 @mixin focus-ring {
-  outline: 2px solid $color-accent;
-  outline-offset: 2px;
+  @include m.focus-ring($color-accent);
 }
 
 // Main Navbar Container
@@ -66,6 +66,7 @@ $breakpoint-large: 1440px;
   align-items: center;
   justify-content: space-between;
   height: 100%;
+
   // max-width: $navbar-width;
   margin: 0 auto;
   padding: 0 $space-xl;
@@ -132,6 +133,7 @@ $breakpoint-large: 1440px;
 
   &:focus-visible {
     @include focus-ring;
+
     border-radius: $space-xs;
   }
 }
@@ -221,16 +223,18 @@ $breakpoint-large: 1440px;
   background: $color-accent;
   border: none;
   cursor: pointer;
+
   @include flex-center;
+
   transition: background $transition-fast;
   color: $color-white;
 
   &:hover {
-    background: darken($color-accent, 5%);
+    background: color.adjust($color-accent, $lightness: -5%);
   }
 
   &:active {
-    background: darken($color-accent, 10%);
+    background: color.adjust($color-accent, $lightness: -10%);
   }
 
   &:focus-visible {
@@ -275,6 +279,7 @@ $breakpoint-large: 1440px;
 
   &:focus-visible {
     @include focus-ring;
+
     border-radius: $space-xs;
     text-decoration: none;
   }
@@ -293,7 +298,9 @@ $breakpoint-large: 1440px;
   background: none;
   border: none;
   cursor: pointer;
+
   @include flex-center;
+
   color: $color-primary;
   transition: transform $transition-fast;
   border-radius: 50%;
@@ -329,7 +336,9 @@ $breakpoint-large: 1440px;
   font-size: 10px;
   font-weight: 600;
   border-radius: 50%;
+
   @include flex-center;
+
   border: 2px solid $color-white;
   animation: pulse 2s infinite;
 }
@@ -412,7 +421,7 @@ $breakpoint-large: 1440px;
   min-width: 180px;
   background: $color-white;
   border-radius: 8px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 10px 40px rgb(0 0 0 / 10%), 0 2px 8px rgb(0 0 0 / 4%);
   padding: $space-xs 0;
   animation: dropdownEnter 0.2s ease-out;
   z-index: 1001;
@@ -467,6 +476,7 @@ $breakpoint-large: 1440px;
     opacity: 0;
     transform: translateY(-8px) scale(0.96);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -477,6 +487,7 @@ $breakpoint-large: 1440px;
   0%, 100% {
     box-shadow: 0 0 0 0 rgba($color-accent, 0.4);
   }
+
   50% {
     box-shadow: 0 0 0 4px rgba($color-accent, 0);
   }
@@ -498,6 +509,7 @@ $breakpoint-large: 1440px;
 
   .logoIcon {
     width: 100px;
+
     // height: 30px;
   }
 }

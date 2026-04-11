@@ -1,0 +1,32 @@
+@use "sass:color";
+@use "./variables" as v;
+
+@mixin flex-center {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+@mixin focus-ring($color: v.$color-accent, $offset: 2px) {
+	outline: 2px solid $color;
+	outline-offset: $offset;
+}
+
+@mixin text-truncate {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+@mixin button-interaction($bg, $hover-step: -5%, $active-step: -10%) {
+	background: $bg;
+	transition: background v.$transition-fast;
+
+	&:hover {
+		background: color.adjust($bg, $lightness: $hover-step);
+	}
+
+	&:active {
+		background: color.adjust($bg, $lightness: $active-step);
+	}
+}

@@ -1,10 +1,13 @@
+@use "../../../styles/variables" as v;
+@use "../../../styles/mixins" as m;
+
 // Design Tokens - Exact values from Figma
-$color-primary: #213f7d;
-$color-accent: #39cdcc;
-$color-text-secondary: #545f7d;
-$color-white: #ffffff;
-$color-border: rgba(33, 63, 125, 0.1);
-$color-active-bg: rgba(57, 205, 204, 0.06);
+$color-primary: v.$color-primary;
+$color-accent: v.$color-accent;
+$color-text-secondary: v.$color-secondary;
+$color-white: v.$color-white;
+$color-border: v.$color-border-light;
+$color-active-bg: rgb(57 205 204 / 6%);
 
 // Dimensions - Exact from Figma
 $sidebar-width: 283px;
@@ -13,17 +16,12 @@ $item-height: 40px;
 $stripe-width: 3px;
 
 // Typography - Exact from Figma
-$font-family:
-  "Work Sans",
-  -apple-system,
-  BlinkMacSystemFont,
-  "Segoe UI",
-  sans-serif;
+$font-family: v.$font-family-base;
 $font-size-label: 12px;
 $font-size-nav: 16px;
 $font-size-version: 12px;
-$font-weight-regular: 400;
-$font-weight-medium: 500;
+$font-weight-regular: v.$font-weight-regular;
+$font-weight-medium: v.$font-weight-medium;
 $line-height-label: 14px;
 $line-height-nav: 19px;
 
@@ -33,21 +31,20 @@ $icon-size: 16px;
 $icon-margin: 10px;
 
 // Shadows
-$shadow-sidebar: 0px 5px 20px rgba(0, 0, 0, 0.04);
+$shadow-sidebar: 0px 5px 20px rgb(0 0 0 / 4%);
 
 // Transitions
-$transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-$transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-$transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-fast: v.$transition-fast;
+$transition-base: v.$transition-base;
+$transition-slow: v.$transition-slow;
 
 // Breakpoints
-$breakpoint-tablet: 768px;
-$breakpoint-desktop: 1024px;
+$breakpoint-tablet: v.$breakpoint-md;
+$breakpoint-desktop: v.$breakpoint-lg;
 
 // Mixins
 @mixin focus-ring {
-  outline: 2px solid $color-accent;
-  outline-offset: 2px;
+  @include m.focus-ring($color-accent);
 }
 
 @mixin nav-item-base {
@@ -64,7 +61,7 @@ $breakpoint-desktop: 1024px;
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgb(0 0 0 / 50%);
   backdrop-filter: blur(2px);
   z-index: 2500;
   animation: fadeIn $transition-base;
@@ -110,8 +107,7 @@ $breakpoint-desktop: 1024px;
 // Scrollable Container
 .scrollContainer {
   flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -296,6 +292,7 @@ $breakpoint-desktop: 1024px;
 
 .navLink {
   @include nav-item-base;
+
   color: $color-primary;
   opacity: 0.6;
   font-family: $font-family;
@@ -313,6 +310,7 @@ $breakpoint-desktop: 1024px;
 
   &:focus-visible {
     @include focus-ring;
+
     opacity: 1;
   }
 
@@ -409,7 +407,7 @@ $breakpoint-desktop: 1024px;
 
 .logoutButton {
   @include nav-item-base;
-  width: 100%;
+
   background: none;
   border: none;
   cursor: pointer;
@@ -419,14 +417,13 @@ $breakpoint-desktop: 1024px;
   font-weight: $font-weight-regular;
   line-height: $line-height-nav;
   gap: $icon-margin;
-  margin-bottom: 8px;
   border-radius: 8px;
   margin: 0 $padding-horizontal 8px;
   width: calc(100% - #{$padding-horizontal * 2});
 
   &:hover {
     color: #e4033b;
-    background: rgba(228, 3, 59, 0.05);
+    background: rgb(228 3 59 / 5%);
   }
 
   &:focus-visible {
@@ -470,6 +467,7 @@ $breakpoint-desktop: 1024px;
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }

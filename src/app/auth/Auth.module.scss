@@ -8,11 +8,11 @@
   --text-muted: #A0A3BD;
   --border-color: #E5E7EB;
   --error: #E4033B;
-  --white: #FFFFFF;
+  --white: #FFF;
   --background: #F8F9FA;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 5%);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -1px rgb(0 0 0 / 6%);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -2px rgb(0 0 0 / 5%);
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
@@ -26,7 +26,7 @@ $breakpoint-sm: 640px;
 $breakpoint-md: 768px;
 $breakpoint-lg: 1024px;
 $breakpoint-xl: 1280px;
-$authInputMaxWidth: 447px;
+$auth-input-max-width: 447px;
 
 // Mixins
 @mixin flex-center {
@@ -38,7 +38,7 @@ $authInputMaxWidth: 447px;
 @mixin input-focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(57, 205, 204, 0.1);
+  box-shadow: 0 0 0 3px rgb(57 205 204 / 10%);
 }
 
 @mixin button-hover {
@@ -90,8 +90,8 @@ $authInputMaxWidth: 447px;
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle at 30% 70%, rgba(57, 205, 204, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 70% 30%, rgba(255, 51, 102, 0.03) 0%, transparent 50%);
+    background: radial-gradient(circle at 30% 70%, rgb(57 205 204 / 3%) 0%, transparent 50%),
+                radial-gradient(circle at 70% 30%, rgb(255 51 102 / 3%) 0%, transparent 50%);
     pointer-events: none;
   }
 }
@@ -117,15 +117,14 @@ $authInputMaxWidth: 447px;
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.02em;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .logoRight {
-  position: relative;
                                                                                                                   display: block;
   position: absolute;
   top: 206px;
-  left: calc((100vw - $authInputMaxWidth)/2);
+  left: calc((100vw - $auth-input-max-width) / 2);
   z-index: 5;
 
   @media (min-width: $breakpoint-lg) {
@@ -149,6 +148,7 @@ $authInputMaxWidth: 447px;
 .illustrationSvg {
   width: 100%;
   height: auto;
+
   // filter: drop-shadow(0 20px 40px rgba(33, 63, 125, 0.1));
 }
 
@@ -171,7 +171,7 @@ $authInputMaxWidth: 447px;
 
 .formContainer {
   width: 100%;
-  max-width: $authInputMaxWidth;
+  max-width: $auth-input-max-width;
   animation: fadeInUp 0.6s var(--transition-base) forwards;
   opacity: 0;
   transform: translateY(20px);
@@ -237,10 +237,10 @@ $authInputMaxWidth: 447px;
 
   &.inputError {
     border-color: var(--error);
-    background-color: rgba(228, 3, 59, 0.02);
+    background-color: rgb(228 3 59 / 2%);
 
     &:focus {
-      box-shadow: 0 0 0 3px rgba(228, 3, 59, 0.1);
+      box-shadow: 0 0 0 3px rgb(228 3 59 / 10%);
     }
   }
 }
@@ -352,6 +352,7 @@ $authInputMaxWidth: 447px;
   position: relative;
   overflow: hidden;
   min-height: 3.5rem;
+
   @include flex-center;
 
   &::before {
@@ -361,12 +362,13 @@ $authInputMaxWidth: 447px;
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 20%), transparent);
     transition: left 0.5s;
   }
 
   &:hover:not(:disabled) {
     @include button-hover;
+
     background: var(--primary-hover);
 
     &::before {
@@ -376,6 +378,7 @@ $authInputMaxWidth: 447px;
 
   &:active:not(:disabled) {
     @include button-active;
+
     background: var(--primary-active);
   }
 
@@ -407,6 +410,7 @@ $authInputMaxWidth: 447px;
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -417,6 +421,7 @@ $authInputMaxWidth: 447px;
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
