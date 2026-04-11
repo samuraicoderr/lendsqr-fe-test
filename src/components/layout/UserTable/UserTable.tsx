@@ -30,6 +30,7 @@ type ListUsersParams = {
 type ListUsersResponse = {
 	rows: UserRecord[];
 	totalPages: number;
+	totalItems: number;
 };
 
 const PAGE_SIZE = 10;
@@ -94,6 +95,7 @@ const listUsers = async ({ filters, page, pageSize }: ListUsersParams): Promise<
 	return {
 		rows: filtered.slice(start, end),
 		totalPages,
+		totalItems: filtered.length,
 	};
 };
 
@@ -107,7 +109,9 @@ export default function UserTable() {
 	const [rows, setRows] = useState<UserRecord[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [page, setPage] = useState(1);
+	const [itemsPerPage, setItemsPerPage] = useState(PAGE_SIZE);
 	const [totalPages, setTotalPages] = useState(1);
+	const [totalItems, setTotalItems] = useState(0);
 	const [filters, setFilters] = useState<FilterValues>({});
 
 	const organizations = useMemo(
@@ -121,14 +125,15 @@ export default function UserTable() {
 			const response = await listUsers({
 				filters,
 				page,
-				pageSize: PAGE_SIZE,
+				pageSize: itemsPerPage,
 			});
 			setRows(response.rows);
 			setTotalPages(response.totalPages);
+			setTotalItems(response.totalItems);
 		} finally {
 			setLoading(false);
 		}
-	}, [filters, page]);
+	}, [filters, itemsPerPage, page]);
 
 	useEffect(() => {
 		runListUsers();
@@ -226,6 +231,11 @@ export default function UserTable() {
 		setFilters({});
 	}, []);
 
+	const handleItemsPerPageChange = useCallback((nextItemsPerPage: number) => {
+		setItemsPerPage(nextItemsPerPage);
+		setPage(1);
+	}, []);
+
 	const rowActions: RowAction[] = useMemo(
 		() => [
 			{
@@ -275,7 +285,10 @@ export default function UserTable() {
 			pagination={{
 				currentPage: page,
 				totalPages,
+				totalItems,
+				itemsPerPage,
 				onPageChange: setPage,
+				onItemsPerPageChange: handleItemsPerPageChange,
 			}}
 		/>
 	);

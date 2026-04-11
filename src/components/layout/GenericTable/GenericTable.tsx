@@ -7,6 +7,7 @@ import {
 } from 'react-icons/fa';
 import { Tooltip } from 'react-tooltip';
 import { createPopper, type Instance as PopperInstance, type Placement } from '@popperjs/core';
+import Paginator from './Paginator';
 import styles from './GenericTable.module.scss';
 
 // ============================================
@@ -65,10 +66,14 @@ export interface GenericTableProps<T = any> {
   rowClassName?: string;
   maxHeight?: string;
   onRowClick?: (row: T, index: number) => void;
+  paginationPlacement?: 'inside' | 'outside';
   pagination?: {
     currentPage: number;
     totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
     onPageChange: (page: number) => void;
+    onItemsPerPageChange?: (itemsPerPage: number) => void;
   };
 }
 
@@ -159,6 +164,7 @@ function GenericTable<T extends Record<string, any>>({
   rowClassName = '',
   maxHeight,
   onRowClick,
+  paginationPlacement = 'outside',
   pagination
 }: GenericTableProps<T>) {
   const FILTER_DROPDOWN_WIDTH = 320;
@@ -466,10 +472,27 @@ function GenericTable<T extends Record<string, any>>({
     </div>
   ) : null;
 
+  const paginationNode = pagination ? (
+    <div
+      className={`${styles.pagination} ${paginationPlacement === 'outside' ? styles.paginationOutside : ''}`}
+    >
+      <Paginator
+        currentPage={pagination.currentPage}
+        totalPages={pagination.totalPages}
+        totalItems={pagination.totalItems}
+        itemsPerPage={pagination.itemsPerPage}
+        onPageChange={pagination.onPageChange}
+        onItemsPerPageChange={pagination.onItemsPerPageChange}
+        showItemsPerPage={Boolean(pagination.onItemsPerPageChange)}
+      />
+    </div>
+  ) : null;
+
   return (
-    <div className={`${styles.tableContainer} ${className}`} style={{ maxHeight }}>
-      <div className={`${styles.tableWrapper} ${tableClassName}`}>
-        <table className={styles.table}>
+    <div className={styles.tableLayout}>
+      <div className={`${styles.tableContainer} ${className}`} style={{ maxHeight }}>
+        <div className={`${styles.tableWrapper} ${tableClassName}`}>
+          <table className={styles.table}>
           <thead className={`${styles.tableHead} ${headerClassName}`}>
             <tr>
               {columns.map((column, index) => (
@@ -598,75 +621,43 @@ function GenericTable<T extends Record<string, any>>({
               ))
             )}
           </tbody>
-        </table>
-      </div>
-
-      {typeof document !== 'undefined' ? createPortal(filterDropdown, document.body) : filterDropdown}
-
-      {activeRowMenu !== null && rowActions.length > 0 && sortedData[activeRowMenu] && (
-        <div
-          className={styles.rowMenuDropdown}
-          role="menu"
-          style={{
-            top: `${rowMenuPosition.top}px`,
-            left: `${rowMenuPosition.left}px`,
-          }}
-        >
-          {rowActions.map((action) => (
-            <button
-              key={action.id}
-              className={`${styles.rowMenuItem} ${action.className || ''}`}
-              onClick={() => {
-                action.onClick(sortedData[activeRowMenu], activeRowMenu);
-                setActiveRowMenu(null);
-              }}
-              role="menuitem"
-            >
-              {action.icon && <span className={styles.rowMenuItemIcon}>{action.icon}</span>}
-              <span className={styles.rowMenuItemLabel}>{action.label}</span>
-            </button>
-          ))}
+          </table>
         </div>
-      )}
 
-      <Tooltip id="user-status-tooltip" place="top" className={styles.statusTooltip} />
+        {typeof document !== 'undefined' ? createPortal(filterDropdown, document.body) : filterDropdown}
 
-      {/* Pagination */}
-      {pagination && pagination.totalPages > 1 && (
-        <div className={styles.pagination}>
-          <button
-            className={styles.paginationButton}
-            onClick={() => pagination.onPageChange(pagination.currentPage - 1)}
-            disabled={pagination.currentPage === 1}
-            aria-label="Previous page"
+        {activeRowMenu !== null && rowActions.length > 0 && sortedData[activeRowMenu] && (
+          <div
+            className={styles.rowMenuDropdown}
+            role="menu"
+            style={{
+              top: `${rowMenuPosition.top}px`,
+              left: `${rowMenuPosition.left}px`,
+            }}
           >
-            Previous
-          </button>
-          
-          <div className={styles.paginationPages}>
-            {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(page => (
+            {rowActions.map((action) => (
               <button
-                key={page}
-                className={`${styles.paginationPage} ${page === pagination.currentPage ? styles.paginationPageActive : ''}`}
-                onClick={() => pagination.onPageChange(page)}
-                aria-label={`Page ${page}`}
-                aria-current={page === pagination.currentPage ? 'page' : undefined}
+                key={action.id}
+                className={`${styles.rowMenuItem} ${action.className || ''}`}
+                onClick={() => {
+                  action.onClick(sortedData[activeRowMenu], activeRowMenu);
+                  setActiveRowMenu(null);
+                }}
+                role="menuitem"
               >
-                {page}
+                {action.icon && <span className={styles.rowMenuItemIcon}>{action.icon}</span>}
+                <span className={styles.rowMenuItemLabel}>{action.label}</span>
               </button>
             ))}
           </div>
+        )}
 
-          <button
-            className={styles.paginationButton}
-            onClick={() => pagination.onPageChange(pagination.currentPage + 1)}
-            disabled={pagination.currentPage === pagination.totalPages}
-            aria-label="Next page"
-          >
-            Next
-          </button>
-        </div>
-      )}
+        <Tooltip id="user-status-tooltip" place="top" className={styles.statusTooltip} />
+
+        {paginationPlacement === 'inside' && paginationNode}
+      </div>
+
+      {paginationPlacement === 'outside' && paginationNode}
     </div>
   );
 }

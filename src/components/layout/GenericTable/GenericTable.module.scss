@@ -101,6 +101,13 @@ $radius-dropdown: 4px;
   position: relative;
 }
 
+.tableLayout {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .tableWrapper {
   overflow-x: auto;
   overflow-y: auto;
@@ -135,6 +142,7 @@ $radius-dropdown: 4px;
   border-spacing: 0;
   font-family: $font-family;
   table-layout: auto;
+  padding: 31px 30px;
 }
 
 // ============================================
@@ -704,6 +712,12 @@ $radius-dropdown: 4px;
   padding: 20px;
   border-top: 1px solid $color-border-light;
   background: $color-white;
+}
+
+.paginationOutside {
+  border-top: none;
+  padding: 0;
+  background: transparent;
 }
 
 .paginationButton {
