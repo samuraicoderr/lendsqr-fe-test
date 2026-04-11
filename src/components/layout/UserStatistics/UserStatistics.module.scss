@@ -1,0 +1,206 @@
+// UserStatistics.module.scss
+// Exact Figma specifications
+
+// Design Tokens
+$color-primary: #213F7D;
+$color-text-label: #545F7D;
+$color-white: #FFFFFF;
+$color-border: rgba(33, 63, 125, 0.06);
+
+$font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+// Exact dimensions from Figma analysis
+$card-width: 240px;
+$card-height: 160px;
+$card-padding: 20px;
+$icon-size: 40px;
+$icon-wrapper-size: 40px;
+
+// Typography
+$font-size-label: 14px;
+$font-size-value: 24px;
+$font-weight-label: 500;
+$font-weight-value: 600;
+$line-height-label: 16px;
+$line-height-value: 28px;
+
+// Spacing
+$gap: 26px;
+
+// Shadows
+$shadow-card: 3px 5px 20px rgba(0, 0, 0, 0.04);
+
+// Transitions
+$transition-base: 200ms ease;
+
+.container {
+  width: 100%;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $gap;
+  
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  padding: $card-padding;
+  background: $color-white;
+  border: 1px solid $color-border;
+  border-radius: 4px;
+  box-shadow: $shadow-card;
+  transition: transform $transition-base, box-shadow $transition-base;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 3px 8px 25px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.iconWrapper {
+  width: $icon-wrapper-size;
+  height: $icon-wrapper-size;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.icon {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.label {
+  letter-spacing: 0%;
+  margin-bottom: 12px;
+  font-family: $font-family;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 16px;
+  color: #545F7D;
+  text-transform: uppercase;
+  font-style: normal;
+  font-weight: 500;
+}
+
+.value {
+  font-family: $font-family;
+  font-size: $font-size-value;
+  font-weight: $font-weight-value;
+  line-height: $line-height-value;
+  text-transform: uppercase;
+  color: $color-primary;
+}
+
+// Loading Skeleton
+.skeletonGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $gap;
+  
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.skeletonCard {
+  display: flex;
+  flex-direction: column;
+  padding: $card-padding;
+  background: $color-white;
+  border: 1px solid $color-border;
+  border-radius: 4px;
+}
+
+.skeletonIcon {
+  width: $icon-wrapper-size;
+  height: $icon-wrapper-size;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  margin-bottom: 14px;
+}
+
+.skeletonLabel {
+  width: 80px;
+  height: 16px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  margin-bottom: 12px;
+  border-radius: 4px;
+}
+
+.skeletonValue {
+  width: 100px;
+  height: 28px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// Error State
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  gap: 16px;
+  color: $color-text-label;
+  font-family: $font-family;
+  
+  button {
+    padding: 10px 24px;
+    background: #213F7D;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: $font-family;
+    font-weight: 500;
+    
+    &:hover {
+      background: darken(#213F7D, 5%);
+    }
+  }
+}
+
+// Reduced motion
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .skeletonIcon,
+  .skeletonLabel,
+  .skeletonValue {
+    transition: none;
+    animation: none;
+  }
+}
