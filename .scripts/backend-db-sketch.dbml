@@ -1,0 +1,1418 @@
+// Lendsqr Lending & Savings Platform ERD
+
+// ==================================================================
+// A Rough ERD sketch of what I feel the database is structured like
+// ==================================================================
+
+Table users {
+  id uuid [pk, default: `gen_random_uuid()`]
+  organization_id uuid [not null, ref: > organizations.id]
+  
+  // Personal Information
+  first_name varchar(100) [not null]
+  last_name varchar(100) [not null]
+  email varchar(255) [unique, not null]
+  phone_number varchar(20) [unique, not null]
+  date_of_birth date
+  gender gender_enum
+  marital_status marital_status_enum
+  bvn varchar(11) [unique, note: 'Bank Verification Number']
+  nin varchar(11) [unique, note: 'National Identity Number']
+  
+  // Authentication
+  password_hash varchar(255) [not null]
+  email_verified_at timestamp
+  phone_verified_at timestamp
+  bvn_verified_at timestamp
+  kyc_level kyc_level_enum [default: 'level_1']
+  kyc_verified_at timestamp
+  
+  // Status & Tier
+  status user_status_enum [default: 'inactive', note: 'inactive, active, blacklisted, pending']
+  tier user_tier_enum [default: 'tier_1']
+  karma_score int [default: 0, note: '0-100 score based on repayment history']
+  
+  // Metadata
+  referral_code varchar(20) [unique]
+  referred_by uuid [null, ref: > users.id]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  deleted_at timestamp [null, note: 'Soft delete']
+  
+  indexes {
+    (email) [name: 'idx_users_email']
+    (phone_number) [name: 'idx_users_phone']
+    (organization_id) [name: 'idx_users_org']
+    (status) [name: 'idx_users_status']
+    (bvn) [name: 'idx_users_bvn']
+  }
+}
+
+Table user_profiles {
+  id uuid [pk, default: `gen_random_uuid()`]
+  user_id uuid [unique, not null, ref: > users.id]
+  
+  // Extended Personal Info
+  avatar_url varchar(500)
+  address text
+  city varchar(100)
+  state varchar(100)
+  country varchar(100) [default: 'Nigeria']
+  lga varchar(100) [note: 'Local Government Area']
+  zip_code varchar(20)
+  
+  // Employment
+  employment_status employment_status_enum
+  employer_name varchar(200)
+  employer_address text
+  job_title varchar(100)
+  monthly_income decimal(15,2)
+  income_range income_range_enum
+  
+  // Next of Kin
+  next_of_kin_name varchar(200)
+  next_of_kin_phone varchar(20)
+  next_of_kin_relationship varchar(50)
+  next_of_kin_address text
+  
+  // Metadata
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table user_documents {
+  id uuid [pk, default: `gen_random_uuid()`]
+  user_id uuid [not null, ref: > users.id]
+  
+  document_type document_type_enum [not null]
+  document_number varchar(100)
+  document_url varchar(500) [not null]
+  thumbnail_url varchar(500)
+  
+  verification_status verification_status_enum [default: 'pending']
+  verified_by uuid [ref: > staff_users.id]
+  verified_at timestamp
+  
+  expiry_date date
+  is_active boolean [default: true]
+  
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  
+  indexes {
+    (user_id, document_type) [name: 'idx_user_docs_type']
+  }
+}
+
+// ============================================
+// ORGANIZATION & BUSINESS STRUCTURE
+// ============================================
+
+Table organizations {
+  id uuid [pk, default: `gen_random_uuid()`]
+  
+  name varchar(200) [not null]
+  slug varchar(100) [unique, not null]
+  email varchar(255) [unique]
+  phone varchar(20)
+  website varchar(255)
+  
+  // Business Info
+  registration_number varchar(50)
+  tax_id varchar(50)
+  industry varchar(100)
+  
+  // Address
+  address text
+  city varchar(100)
+  state varchar(100)
+  country varchar(100) [default: 'Nigeria']
+  
+  // Settings
+  settings jsonb [default: '{}', note: 'Organization-specific configurations']
+  features jsonb [default: '[]', note: 'Enabled features array']
+  
+  status organization_status_enum [default: 'active']
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  
+  indexes {
+    (slug) [name: 'idx_org_slug']
+    (status) [name: 'idx_org_status']
+  }
+}
+
+Table organization_branches {
+  id uuid [pk, default: `gen_random_uuid()`]
+  organization_id uuid [not null, ref: > organizations.id]
+  
+  name varchar(200) [not null]
+  code varchar(20) [not null]
+  address text
+  city varchar(100)
+  state varchar(100)
+  manager_id uuid [ref: > staff_users.id]
+  
+  is_active boolean [default: true]
+  created_at timestamp [default: `now()`]
+  
+  indexes {
+    (organization_id, code) [unique, name: 'idx_branch_code']
+  }
+}
+
+// ============================================
+// STAFF & PERMISSIONS
+// ============================================
+
+Table staff_users {
+  id uuid [pk, default: `gen_random_uuid()`]
+  organization_id uuid [not null, ref: > organizations.id]
+  
+  first_name varchar(100) [not null]
+  last_name varchar(100) [not null]
+  email varchar(255) [unique, not null]
+  phone varchar(20)
+  
+  password_hash varchar(255) [not null]
+  role staff_role_enum [default: 'officer']
+  department department_enum
+  
+  permissions jsonb [default: '[]']
+  is_active boolean [default: true]
+  last_login_at timestamp
+  
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table staff_activities {
+  id uuid [pk, default: `gen_random_uuid()`]
+  staff_id uuid [not null, ref: > staff_users.id]
+  
+  action varchar(100) [not null]
+  entity_type varchar(50) [not null]
+  entity_id uuid
+  details jsonb
+  
+  ip_address inet
+  user_agent text
+  
+  created_at timestamp [default: `now()`]
+  
+  indexes {
+    (staff_id) [name: 'idx_staff_act_staff']
+    (entity_type, entity_id) [name: 'idx_staff_act_entity']
+    (created_at) [name: 'idx_staff_act_date']
+  }
+}
+
+// ============================================
+// PRODUCTS: LOANS & SAVINGS
+// ============================================
+
+Table loan_products {
+  id uuid [pk, default: `gen_random_uuid()`]
+  organization_id uuid [not null, ref: > organizations.id]
+  
+  name varchar(200) [not null]
+  code varchar(50) [unique, not null]
+  description text
+  
+  // Loan Terms
+  min_amount decimal(15,2) [not null]
+  max_amount decimal(15,2) [not null]
+  interest_rate decimal(5,4) [not null, note: 'Annual interest rate']
+  interest_type interest_type_enum [default: 'flat']
+  tenure_min_months int [default: 1]
+  tenure_max_months int [default: 12]
+  
+  // Fees
+  processing_fee_rate decimal(5,4) [default: 0]
+  insurance_fee_rate decimal(5,4) [default: 0]
+  late_fee_rate decimal(5,4) [default: 0]
+  late_fee_grace_days int [default: 3]
+  
+  // Requirements
+  min_kyc_level kyc_level_enum [default: 'level_1']
+  min_credit_score int [default: 0]
+  requires_collateral boolean [default: false]
+  requires_guarantor boolean [default: false]
+  
+  // Decision Model
+  decision_model_id uuid [ref: > decision_models.id]
+  
+  is_active boolean [default: true]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  
+  indexes {
+    (organization_id) [name: 'idx_loan_prod_org']
+    (code) [name: 'idx_loan_prod_code']
+    (is_active) [name: 'idx_loan_prod_active']
+  }
+}
+
+Table savings_products {
+  id uuid [pk, default: `gen_random_uuid()`]
+  organization_id uuid [not null, ref: > organizations.id]
+  
+  name varchar(200) [not null]
+  code varchar(50) [unique, not null]
+  description text
+  product_type savings_type_enum [not null]
+  
+  // Interest
+  interest_rate decimal(5,4) [default: 0]
+  interest_calculation_method interest_calc_method_enum [default: 'daily_balance']
+  interest_payout_frequency payout_frequency_enum [default: 'monthly']
+  
+  // Limits
+  min_balance decimal(15,2) [default: 0]
+  min_deposit decimal(15,2) [default: 0]
+  max_deposit decimal(15,2)
+  max_balance decimal(15,2)
+  
+  // Withdrawal
+  withdrawal_restricted boolean [default: false]
+  withdrawal_notice_days int [default: 0]
+  early_withdrawal_penalty_rate decimal(5,4) [default: 0]
+  
+  // Target Savings
+  allows_target boolean [default: false]
+  min_target_amount decimal(15,2)
+  max_target_duration_months int
+  
+  is_active boolean [default: true]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  
+  indexes {
+    (organization_id) [name: 'idx_sav_prod_org']
+    (product_type) [name: 'idx_sav_prod_type']
+  }
+}
+
+// ============================================
+// LOAN MANAGEMENT
+// ============================================
+
+Table loans {
+  id uuid [pk, default: `gen_random_uuid()`]
+  loan_product_id uuid [not null, ref: > loan_products.id]
+  user_id uuid [not null, ref: > users.id]
+  organization_id uuid [not null, ref: > organizations.id]
+  
+  // Loan Details
+  loan_number varchar(50) [unique, not null]
+  principal_amount decimal(15,2) [not null]
+  interest_rate decimal(5,4) [not null]
+  tenure_months int [not null]
+  
+  // Calculated Amounts
+  interest_amount decimal(15,2) [not null]
+  processing_fee decimal(15,2) [default: 0]
+  insurance_fee decimal(15,2) [default: 0]
+  total_amount_due decimal(15,2) [not null]
+  
+  // Disbursement
+  disbursement_status disbursement_status_enum [default: 'pending']
+  disbursed_at timestamp
+  disbursed_by uuid [ref: > staff_users.id]
+  disbursement_account varchar(20)
+  disbursement_bank varchar(100)
+  
+  // Repayment
+  repayment_status repayment_status_enum [default: 'pending']
+  total_repaid decimal(15,2) [default: 0]
+  total_outstanding decimal(15,2) [not null]
+  next_due_date date
+  last_payment_date date
+  
+  // Metadata
+  purpose text
+  collateral_details jsonb
+  decision_data jsonb [note: 'Snapshot of decision model results']
+  
+  status loan_status_enum [default: 'pending']
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  
+  indexes {
+    (user_id) [name: 'idx_loans_user']
+    (loan_number) [name: 'idx_loans_number']
+    (status) [name: 'idx_loans_status']
+    (next_due_date) [name: 'idx_loans_due']
+    (organization_id) [name: 'idx_loans_org']
+  }
+}
+
+Table loan_schedules {
+  id uuid [pk, default: `gen_random_uuid()`]
+  loan_id uuid [not null, ref: > loans.id]
+  
+  installment_number int [not null]
+  due_date date [not null]
+  
+  principal_amount decimal(15,2) [not null]
+  interest_amount decimal(15,2) [not null]
+  total_amount decimal(15,2) [not null]
+  
+  paid_amount decimal(15,2) [default: 0]
+  paid_at timestamp
+  status schedule_status_enum [default: 'pending']
+  
+  indexes {
+    (loan_id, installment_number) [unique, name: 'idx_sched_loan_inst']
+    (due_date) [name: 'idx_sched_due']
+  }
+}
+
+Table loan_requests {
+  id uuid [pk, default: `gen_random_uuid()`]
+  user_id uuid [not null, ref: > users.id]
+  loan_product_id uuid [not null, ref: > loan_products.id]
+  
+  requested_amount decimal(15,2) [not null]
+  requested_tenure int [not null]
+  purpose text
+  
+  status request_status_enum [default: 'pending']
+  
+  // Decision
+  decision_status decision_status_enum
+  decision_at timestamp
+  decision_by uuid [ref: > staff_users.id]
+  decision_reason text
+  approved_amount decimal(15,2)
+  approved_tenure int
+  
+  // Converted to loan
+  loan_id uuid [ref: > loans.id]
+  
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  
+  indexes {
+    (user_id) [name: 'idx_req_user']
+    (status) [name: 'idx_req_status']
+  }
+}
+
+Table loan_payments {
+  id uuid [pk, default: `gen_random_uuid()`]
+  loan_id uuid [not null, ref: > loans.id]
+  user_id uuid [not null, ref: > users.id]
+  
+  amount decimal(15,2) [not null]
+  payment_method payment_method_enum [not null]
+  reference varchar(100) [unique, not null]
+  
+  principal_portion decimal(15,2) [not null]
+  interest_portion decimal(15,2) [not null]
+  penalty_portion decimal(15,2) [default: 0]
+  
+  paid_at timestamp [not null]
+  processed_by uuid [ref: > staff_users.id]
+  
+  created_at timestamp [default: `now()`]
+  
+  indexes {
+    (loan_id) [name: 'idx_pay_loan']
+    (reference) [name: 'idx_pay_ref']
+    (paid_at) [name: 'idx_pay_date']
+  }
+}
+
+// ============================================
+// SAVINGS MANAGEMENT
+// ============================================
+
+Table savings_accounts {
+  id uuid [pk, default: `gen_random_uuid()`]
+  savings_product_id uuid [not null, ref: > savings_products.id]
+  user_id uuid [not null, ref: > users.id]
+  organization_id uuid [not null, ref: > organizations.id]
+  
+  account_number varchar(20) [unique, not null]
+  account_name varchar(200) [not null]
+  
+  balance decimal(15,2) [default: 0]
+  available_balance decimal(15,2) [default: 0]
+  locked_amount decimal(15,2) [default: 0]
+  
+  interest_earned decimal(15,2) [default: 0]
+  interest_paid decimal(15,2) [default: 0]
+  
+  // Target Savings
+  target_amount decimal(15,2)
+  target_date date
+  target_name varchar(200)
+  
+  status account_status_enum [default: 'active']
+  opened_at timestamp [default: `now()`]
+  closed_at timestamp
+  
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  
+  indexes {
+    (user_id) [name: 'idx_sav_acc_user']
+    (account_number) [name: 'idx_sav_acc_num']
+    (savings_product_id) [name: 'idx_sav_acc_prod']
+  }
+}
+
+Table savings_transactions {
+  id uuid [pk, default: `gen_random_uuid()`]
+  savings_account_id uuid [not null, ref: > savings_accounts.id]
+  user_id uuid [not null, ref: > users.id]
+  
+  transaction_type transaction_type_enum [not null]
+  amount decimal(15,2) [not null]
+  
+  balance_before decimal(15,2) [not null]
+  balance_after decimal(15,2) [not null]
+  
+  reference varchar(100) [unique, not null]
+  description text
+  
+  status transaction_status_enum [default: 'completed']
+  processed_at timestamp [default: `now()`]
+  
+  created_at timestamp [default: `now()`]
+  
+  indexes {
+    (savings_account_id) [name: 'idx_sav_txn_acc']
+    (transaction_type) [name: 'idx_sav_txn_type']
+    (created_at) [name: 'idx_sav_txn_date']
+  }
+}
+
+// ============================================
+// GUARANTORS
+// ============================================
+
+Table guarantors {
+  id uuid [pk, default: `gen_random_uuid()`]
+  user_id uuid [not null, ref: > users.id, note: 'User being guaranteed']
+  guarantor_user_id uuid [null, ref: > users.id, note: 'If guarantor is also a user']
+  
+  // Guarantor Info
+  full_name varchar(200) [not null]
+  email varchar(255)
+  phone_number varchar(20) [not null]
+  relationship varchar(50) [not null]
+  
+  address text
+  occupation varchar(100)
+  employer varchar(200)
+  
+  // Verification
+  bvn varchar(11)
+  verified_at timestamp
+  verification_status verification_status_enum [default: 'pending']
+  
+  // Guarantee Limits
+  max_guarantee_amount decimal(15,2)
+  active_guarantees_count int [default: 0]
+  total_guaranteed_amount decimal(15,2) [default: 0]
+  
+  is_active boolean [default: true]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  
+  indexes {
+    (user_id) [name: 'idx_guar_user']
+    (phone_number) [name: 'idx_guar_phone']
+  }
+}
+
+Table loan_guarantees {
+  id uuid [pk, default: `gen_random_uuid()`]
+  loan_id uuid [not null, ref: > loans.id]
+  guarantor_id uuid [not null, ref: > guarantors.id]
+  
+  guaranteed_amount decimal(15,2) [not null]
+  status guarantee_status_enum [default: 'active']
+  
+  created_at timestamp [default: `now()`]
+  released_at timestamp
+  
+  indexes {
+    (loan_id, guarantor_id) [unique, name: 'idx_loan_guar']
+  }
+}
+
+// ============================================
+// TRANSACTIONS & PAYMENTS
+// ============================================
+
+Table transactions {
+  id uuid [pk, default: `gen_random_uuid()`]
+  organization_id uuid [not null, ref: > organizations.id]
+  user_id uuid [not null, ref: > users.id]
+  
+  transaction_type transaction_category_enum [not null]
+  reference varchar(100) [unique, not null]
+  
+  amount decimal(15,2) [not null]
+  currency varchar(3) [default: 'NGN']
+  
+  // Source
+  source_type source_type_enum [not null]
+  source_id uuid [not null]
+  source_account varchar(50)
+  
+  // Destination
+  destination_type dest_type_enum [not null]
+  destination_id uuid
+  destination_account varchar(50)
+  
+  // Status
+  status transaction_status_enum [default: 'pending']
+  processed_at timestamp
+  completed_at timestamp
+  failed_at timestamp
+  failure_reason text
+  
+  // Metadata
+  metadata jsonb [default: '{}']
+  ip_address inet
+  user_agent text
+  
+  created_at timestamp [default: `now()`]
+  
+  indexes {
+    (user_id) [name: 'idx_txn_user']
+    (reference) [name: 'idx_txn_ref']
+    (status) [name: 'idx_txn_status']
+    (created_at) [name: 'idx_txn_date']
+    (transaction_type) [name: 'idx_txn_type']
+  }
+}
+
+Table settlements {
+  id uuid [pk, default: `gen_random_uuid()`]
+  organization_id uuid [not null, ref: > organizations.id]
+  
+  settlement_period_start date [not null]
+  settlement_period_end date [not null]
+  
+  total_transactions int [default: 0]
+  total_amount decimal(15,2) [default: 0]
+  total_fees decimal(15,2) [default: 0]
+  net_amount decimal(15,2) [default: 0]
+  
+  status settlement_status_enum [default: 'pending']
+  settled_at timestamp
+  settlement_reference varchar(100)
+  
+  bank_account varchar(20)
+  bank_name varchar(100)
+  bank_code varchar(10)
+  
+  created_at timestamp [default: `now()`]
+  
+  indexes {
+    (organization_id, settlement_period_start) [name: 'idx_settle_org_period']
+  }
+}
+
+// ============================================
+// FEES & CHARGES
+// ============================================
+
+Table fee_structures {
+  id uuid [pk, default: `gen_random_uuid()`]
+  organization_id uuid [not null, ref: > organizations.id]
+  
+  name varchar(200) [not null]
+  fee_type fee_type_enum [not null]
+  application_scope scope_enum [not null]
+  
+  // Calculation
+  calculation_method calc_method_enum [not null]
+  flat_amount decimal(15,2)
+  percentage_rate decimal(5,4)
+  min_amount decimal(15,2)
+  max_amount decimal(15,2)
+  
+  // Conditions
+  applicable_products jsonb [default: '[]']
+  min_transaction_amount decimal(15,2)
+  max_transaction_amount decimal(15,2)
+  
+  is_active boolean [default: true]
+  effective_from date [not null]
+  effective_to date
+  
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table fees_charges {
+  id uuid [pk, default: `gen_random_uuid()`]
+  fee_structure_id uuid [not null, ref: > fee_structures.id]
+  
+  entity_type entity_type_enum [not null]
+  entity_id uuid [not null]
+  
+  base_amount decimal(15,2) [not null]
+  fee_amount decimal(15,2) [not null]
+  
+  description text
+  waived boolean [default: false]
+  waived_by uuid [ref: > staff_users.id]
+  waived_reason text
+  
+  created_at timestamp [default: `now()`]
+  
+  indexes {
+    (entity_type, entity_id) [name: 'idx_fees_entity']
+  }
+}
+
+// ============================================
+// DECISION MODELS & CREDIT SCORING
+// ============================================
+
+Table decision_models {
+  id uuid [pk, default: `gen_random_uuid()`]
+  organization_id uuid [not null, ref: > organizations.id]
+  
+  name varchar(200) [not null]
+  version varchar(10) [default: '1.0']
+  model_type model_type_enum [not null]
+  
+  // Configuration
+  rules jsonb [not null, note: 'JSON array of decision rules']
+  weights jsonb [not null, note: 'Feature weights for scoring']
+  thresholds jsonb [not null, note: 'Approval/rejection thresholds']
+  
+  // Features
+  required_data_points jsonb [default: '[]']
+  data_sources jsonb [default: '[]']
+  
+  is_active boolean [default: true]
+  is_default boolean [default: false]
+  
+  created_by uuid [not null, ref: > staff_users.id]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  
+  indexes {
+    (organization_id, is_default) [name: 'idx_model_org_default']
+  }
+}
+
+Table credit_scores {
+  id uuid [pk, default: `gen_random_uuid()`]
+  user_id uuid [not null, ref: > users.id]
+  decision_model_id uuid [not null, ref: > decision_models.id]
+  
+  score int [not null, note: '0-100 or 0-850 depending on model']
+  rating credit_rating_enum
+  risk_level risk_level_enum
+  
+  // Factors
+  factors jsonb [note: 'Breakdown of score components']
+  recommendations jsonb [default: '[]']
+  
+  // Source Data
+  data_snapshot jsonb [note: 'Data used for scoring']
+  
+  calculated_at timestamp [default: `now()`]
+  expires_at timestamp
+  
+  indexes {
+    (user_id, calculated_at) [name: 'idx_credit_user_date']
+  }
+}
+
+// ============================================
+// WHITELIST & BLACKLIST (KARMA)
+// ============================================
+
+Table whitelist_entries {
+  id uuid [pk, default: `gen_random_uuid()`]
+  organization_id uuid [not null, ref: > organizations.id]
+  
+  entity_type entity_type_enum [not null]
+  entity_id uuid [not null]
+  entity_value varchar(255) [not null, note: 'Email, phone, BVN, etc.']
+  
+  reason text
+  expires_at timestamp
+  
+  added_by uuid [not null, ref: > staff_users.id]
+  added_at timestamp [default: `now()`]
+  
+  indexes {
+    (entity_type, entity_value) [name: 'idx_wl_entity']
+  }
+}
+
+Table blacklist_entries {
+  id uuid [pk, default: `gen_random_uuid()`]
+  organization_id uuid [not null, ref: > organizations.id]
+  
+  user_id uuid [ref: > users.id]
+  entity_type entity_type_enum [not null]
+  entity_value varchar(255) [not null]
+  
+  blacklist_type blacklist_type_enum [default: 'manual']
+  reason text [not null]
+  evidence jsonb [default: '[]']
+  
+  // Automatic blacklisting data
+  triggered_by_entity_id uuid
+  triggered_by_entity_type varchar(50)
+  
+  expires_at timestamp [null, note: 'Null for permanent']
+  
+  added_by uuid [ref: > staff_users.id]
+  added_at timestamp [default: `now()`]
+  
+  removed_by uuid [ref: > staff_users.id]
+  removed_at timestamp
+  removal_reason text
+  
+  indexes {
+    (entity_type, entity_value) [name: 'idx_bl_entity']
+    (user_id) [name: 'idx_bl_user']
+  }
+}
+
+Table karma_history {
+  id uuid [pk, default: `gen_random_uuid()`]
+  user_id uuid [not null, ref: > users.id]
+  
+  event_type karma_event_enum [not null]
+  points_change int [not null]
+  new_total int [not null]
+  
+  reference_type varchar(50) [note: 'loan, payment, etc.']
+  reference_id uuid
+  
+  description text
+  metadata jsonb
+  
+  created_at timestamp [default: `now()`]
+  
+  indexes {
+    (user_id, created_at) [name: 'idx_karma_user_date']
+  }
+}
+
+// ============================================
+// SERVICES & INTEGRATIONS
+// ============================================
+
+Table services {
+  id uuid [pk, default: `gen_random_uuid()`]
+  organization_id uuid [not null, ref: > organizations.id]
+  
+  name varchar(200) [not null]
+  service_type service_type_enum [not null]
+  provider varchar(100) [not null]
+  
+  // Configuration
+  config jsonb [not null]
+  credentials_encrypted text [note: 'Encrypted API keys']
+  
+  // Status
+  status service_status_enum [default: 'active']
+  last_health_check_at timestamp
+  last_health_check_status varchar(20)
+  
+  is_active boolean [default: true]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  
+  indexes {
+    (organization_id, service_type) [name: 'idx_svc_org_type']
+  }
+}
+
+Table service_accounts {
+  id uuid [pk, default: `gen_random_uuid()`]
+  service_id uuid [not null, ref: > services.id]
+  user_id uuid [not null, ref: > users.id]
+  
+  external_account_id varchar(100) [not null]
+  external_account_data jsonb
+  
+  status service_status_enum [default: 'active']
+  last_synced_at timestamp
+  
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  
+  indexes {
+    (service_id, user_id) [unique, name: 'idx_svc_acc_unique']
+  }
+}
+
+// ============================================
+// AUDIT & SYSTEM
+// ============================================
+
+Table audit_logs {
+  id uuid [pk, default: `gen_random_uuid()`]
+  organization_id uuid [ref: > organizations.id]
+  
+  // Actor
+  actor_type actor_type_enum [not null]
+  actor_id uuid [not null]
+  actor_email varchar(255)
+  
+  // Action
+  action varchar(100) [not null]
+  entity_type varchar(50) [not null]
+  entity_id uuid
+  
+  // Data
+  old_values jsonb
+  new_values jsonb
+  changes jsonb [note: 'Computed diff']
+  
+  // Context
+  ip_address inet
+  user_agent text
+  request_id varchar(100)
+  
+  created_at timestamp [default: `now()`]
+  
+  indexes {
+    (entity_type, entity_id) [name: 'idx_audit_entity']
+    (actor_id, created_at) [name: 'idx_audit_actor']
+    (created_at) [name: 'idx_audit_date']
+    (action) [name: 'idx_audit_action']
+  }
+}
+
+Table system_messages {
+  id uuid [pk, default: `gen_random_uuid()`]
+  organization_id uuid [ref: > organizations.id]
+  
+  message_type message_type_enum [not null]
+  priority message_priority_enum [default: 'medium']
+  
+  title varchar(200) [not null]
+  content text [not null]
+  
+  // Targeting
+  target_audience audience_enum [default: 'all']
+  target_users jsonb [default: '[]', note: 'Specific user IDs']
+  
+  // Scheduling
+  scheduled_at timestamp
+  expires_at timestamp
+  
+  // Status
+  status message_status_enum [default: 'draft']
+  sent_at timestamp
+  sent_count int [default: 0]
+  
+  created_by uuid [ref: > staff_users.id]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  
+  indexes {
+    (status, scheduled_at) [name: 'idx_msg_scheduled']
+    (target_audience) [name: 'idx_msg_audience']
+  }
+}
+
+Table user_notifications {
+  id uuid [pk, default: `gen_random_uuid()`]
+  user_id uuid [not null, ref: > users.id]
+  system_message_id uuid [ref: > system_messages.id]
+  
+  channel notification_channel_enum [not null]
+  title varchar(200)
+  content text
+  
+  status notification_status_enum [default: 'pending']
+  sent_at timestamp
+  delivered_at timestamp
+  read_at timestamp
+  
+  metadata jsonb
+  created_at timestamp [default: `now()`]
+  
+  indexes {
+    (user_id, status) [name: 'idx_notif_user_status']
+    (read_at) [name: 'idx_notif_read']
+  }
+}
+
+// ============================================
+// REPORTS & ANALYTICS
+// ============================================
+
+Table reports {
+  id uuid [pk, default: `gen_random_uuid()`]
+  organization_id uuid [not null, ref: > organizations.id]
+  
+  name varchar(200) [not null]
+  report_type report_type_enum [not null]
+  description text
+  
+  // Configuration
+  parameters jsonb [not null]
+  schedule report_schedule_enum [default: 'on_demand']
+  next_run_at timestamp
+  
+  // Output
+  format report_format_enum [default: 'pdf']
+  last_generated_at timestamp
+  last_generated_url varchar(500)
+  
+  is_active boolean [default: true]
+  created_by uuid [not null, ref: > staff_users.id]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table report_executions {
+  id uuid [pk, default: `gen_random_uuid()`]
+  report_id uuid [not null, ref: > reports.id]
+  
+  status execution_status_enum [default: 'running']
+  started_at timestamp [default: `now()`]
+  completed_at timestamp
+  
+  parameters_used jsonb
+  result_url varchar(500)
+  error_message text
+  
+  triggered_by uuid [ref: > staff_users.id]
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+Enum gender_enum {
+  male
+  female
+  other
+  prefer_not_to_say
+}
+
+Enum marital_status_enum {
+  single
+  married
+  divorced
+  widowed
+  separated
+}
+
+Enum kyc_level_enum {
+  level_0 [note: 'No verification']
+  level_1 [note: 'Phone verified']
+  level_2 [note: 'ID verified']
+  level_3 [note: 'Address verified']
+  level_4 [note: 'Biometric verified']
+}
+
+Enum user_status_enum {
+  inactive
+  active
+  blacklisted
+  pending
+  suspended
+}
+
+Enum user_tier_enum {
+  tier_1
+  tier_2
+  tier_3
+}
+
+Enum staff_role_enum {
+  super_admin
+  admin
+  manager
+  officer
+  auditor
+  support
+}
+
+Enum department_enum {
+  operations
+  risk
+  collections
+  customer_service
+  finance
+  it
+}
+
+Enum document_type_enum {
+  passport
+  drivers_license
+  national_id
+  voters_card
+  utility_bill
+  bank_statement
+  employment_letter
+  payslip
+}
+
+Enum verification_status_enum {
+  pending
+  verified
+  rejected
+  expired
+}
+
+Enum organization_status_enum {
+  active
+  inactive
+  suspended
+  pending_verification
+}
+
+Enum interest_type_enum {
+  flat
+  reducing_balance
+  compound
+}
+
+Enum interest_calc_method_enum {
+  daily_balance
+  average_balance
+  minimum_balance
+}
+
+Enum payout_frequency_enum {
+  daily
+  weekly
+  monthly
+  quarterly
+  annually
+  maturity
+}
+
+Enum savings_type_enum {
+  regular
+  fixed_deposit
+  target
+  group
+  recurring
+}
+
+Enum employment_status_enum {
+  employed
+  self_employed
+  unemployed
+  student
+  retired
+  business_owner
+}
+
+Enum income_range_enum {
+  below_50k
+  range_50k_100k
+  range_100k_200k
+  range_200k_500k
+  range_500k_1m
+  above_1m
+}
+
+Enum loan_status_enum {
+  pending
+  approved
+  rejected
+  disbursed
+  active
+  completed
+  defaulted
+  written_off
+  cancelled
+}
+
+Enum disbursement_status_enum {
+  pending
+  processing
+  disbursed
+  failed
+}
+
+Enum repayment_status_enum {
+  pending
+  on_track
+  late
+  defaulted
+  completed
+}
+
+Enum schedule_status_enum {
+  pending
+  paid
+  late
+  waived
+}
+
+Enum request_status_enum {
+  pending
+  under_review
+  approved
+  rejected
+  converted
+  cancelled
+}
+
+Enum decision_status_enum {
+  pending
+  auto_approved
+  manual_approved
+  rejected
+  referred
+}
+
+Enum account_status_enum {
+  pending
+  active
+  dormant
+  frozen
+  closed
+}
+
+Enum transaction_type_enum {
+  deposit
+  withdrawal
+  transfer
+  interest
+  fee
+  reversal
+}
+
+Enum transaction_category_enum {
+  loan_disbursement
+  loan_repayment
+  savings_deposit
+  savings_withdrawal
+  fee_charge
+  refund
+  transfer
+  settlement
+}
+
+Enum payment_method_enum {
+  bank_transfer
+  debit_card
+  direct_debit
+  cash
+  cheque
+  mobile_money
+  wallet
+}
+
+Enum source_type_enum {
+  bank_account
+  savings_account
+  loan_account
+  wallet
+  external
+}
+
+Enum dest_type_enum {
+  bank_account
+  savings_account
+  loan_account
+  wallet
+  external
+}
+
+Enum guarantee_status_enum {
+  active
+  released
+  called_upon
+}
+
+Enum settlement_status_enum {
+  pending
+  processing
+  completed
+  failed
+}
+
+Enum fee_type_enum {
+  processing
+  late_payment
+  early_repayment
+  maintenance
+  withdrawal
+  transfer
+  sms
+  statement
+}
+
+Enum scope_enum {
+  loan
+  savings
+  transaction
+  account
+  all
+}
+
+Enum calc_method_enum {
+  flat
+  percentage
+  tiered
+}
+
+Enum entity_type_enum {
+  user
+  loan
+  savings_account
+  transaction
+  guarantor
+}
+
+Enum model_type_enum {
+  rule_based
+  scorecard
+  machine_learning
+  hybrid
+}
+
+Enum credit_rating_enum {
+  excellent
+  good
+  fair
+  poor
+  bad
+}
+
+Enum risk_level_enum {
+  very_low
+  low
+  medium
+  high
+  very_high
+}
+
+Enum blacklist_type_enum {
+  manual
+  automatic
+  fraud
+  default
+}
+
+Enum karma_event_enum {
+  loan_repaid_on_time
+  loan_repaid_early
+  loan_late_payment
+  loan_defaulted
+  profile_completed
+  referral_signed_up
+  document_verified
+  fraudulent_activity
+}
+
+Enum service_type_enum {
+  credit_bureau
+  identity_verification
+  payment_gateway
+  sms
+  email
+  push_notification
+  bank_integration
+  card_issuance
+}
+
+Enum service_status_enum {
+  active
+  inactive
+  error
+  maintenance
+}
+
+Enum actor_type_enum {
+  user
+  staff
+  system
+  api
+}
+
+Enum message_type_enum {
+  announcement
+  maintenance
+  promotion
+  alert
+  update
+}
+
+Enum message_priority_enum {
+  low
+  medium
+  high
+  critical
+}
+
+Enum audience_enum {
+  all
+  users
+  staff
+  specific
+}
+
+Enum message_status_enum {
+  draft
+  scheduled
+  sending
+  sent
+  cancelled
+}
+
+Enum notification_channel_enum {
+  in_app
+  email
+  sms
+  push
+}
+
+Enum notification_status_enum {
+  pending
+  sent
+  delivered
+  failed
+  read
+}
+
+Enum report_type_enum {
+  loan_portfolio
+  savings_summary
+  transaction_history
+  user_analytics
+  financial_statement
+  audit_trail
+  collection_report
+}
+
+Enum report_schedule_enum {
+  on_demand
+  daily
+  weekly
+  monthly
+  quarterly
+}
+
+Enum report_format_enum {
+  pdf
+  excel
+  csv
+  json
+}
+
+Enum execution_status_enum {
+  pending
+  running
+  completed
+  failed
+  cancelled
+}
