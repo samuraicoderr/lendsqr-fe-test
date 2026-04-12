@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import * as _meta from "./meta";
 import '@/styles/global.scss';
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -12,10 +14,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Lendsqr Assessment Project",
-  description: "This is a Lendsqr Assessment Project",
-};
+export const metadata: Metadata = _meta.metadata;
 
 export default function RootLayout({
   children,

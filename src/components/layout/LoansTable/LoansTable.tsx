@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import GenericTable, { Column, FilterConfig, FilterValues, RowAction } from "@/components/layout/GenericTable/GenericTable";
 import StatusPill from "@/components/ui/StatusPill";
+import FrontendLinks from "@/lib/FrontendLinks";
 
 type LoanRecord = {
 	id: string;
@@ -62,6 +64,7 @@ const listLoans = async ({ filters, page, pageSize }: ListParams): Promise<ListR
 const fmtCurrency = (v: number) => `₦${v.toLocaleString("en-US")}`;
 
 export default function LoansTable() {
+	const router = useRouter();
 	const [rows, setRows] = useState<LoanRecord[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [page, setPage] = useState(1);
@@ -107,7 +110,7 @@ export default function LoansTable() {
 	const handleItemsPerPageChange = useCallback((n: number) => { setItemsPerPage(n); setPage(1); }, []);
 
 	const rowActions: RowAction[] = useMemo(() => [
-		{ id: "view", label: "View Details", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: LoanRecord) => { console.log("View loan:", row.id); } },
+		{ id: "view", label: "View Details", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: LoanRecord) => { router.push(FrontendLinks.loanDetails(row.id)); } },
 		{ id: "mark-defaulted", label: "Mark Defaulted", icon: <img src="/media/icons/user-times.svg" alt="" width={16} height={16} />, onClick: async (row: LoanRecord) => { setLoading(true); db = db.map((l) => l.id === row.id ? { ...l, status: "Defaulted" } : l); await runList(); } },
 	], [runList]);
 

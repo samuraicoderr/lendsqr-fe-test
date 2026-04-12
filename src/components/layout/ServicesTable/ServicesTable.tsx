@@ -1,5 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import FrontendLinks from "@/lib/FrontendLinks";
 import GenericTable, { Column, FilterConfig, FilterValues, RowAction } from "@/components/layout/GenericTable/GenericTable";
 import StatusPill from "@/components/ui/StatusPill";
 
@@ -27,6 +29,7 @@ const listSvc = async ({ filters, page, pageSize }: ListParams): Promise<ListRes
 	return { rows: filtered.slice(start, start + pageSize), totalPages: tp, totalItems: filtered.length };
 };
 export default function ServicesTable() {
+	const router = useRouter();
 	const [rows, setRows] = useState<SvcRecord[]>([]); const [loading, setLoading] = useState(true); const [page, setPage] = useState(1); const [itemsPerPage, setItemsPerPage] = useState(PAGE_SIZE); const [totalPages, setTotalPages] = useState(1); const [totalItems, setTotalItems] = useState(0); const [filters, setFilters] = useState<FilterValues>({});
 	const runList = useCallback(async () => { setLoading(true); try { const res = await listSvc({ filters, page, pageSize: itemsPerPage }); setRows(res.rows); setTotalPages(res.totalPages); setTotalItems(res.totalItems); } finally { setLoading(false); } }, [filters, itemsPerPage, page]);
 	useEffect(() => { runList(); }, [runList]);
@@ -48,7 +51,7 @@ export default function ServicesTable() {
 	const handleReset = useCallback(() => { setPage(1); setFilters({}); }, []);
 	const handleItemsPerPageChange = useCallback((n: number) => { setItemsPerPage(n); setPage(1); }, []);
 	const rowActions: RowAction[] = useMemo(() => [
-		{ id: "view", label: "View Details", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: SvcRecord) => { console.log("View:", row.id); } },
+		{ id: "view", label: "View Details", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: SvcRecord) => { router.push(FrontendLinks.serviceDetails(row.id)); } },
 		{ id: "test", label: "Test Connection", icon: <img src="/media/icons/sliders.svg" alt="" width={16} height={16} />, onClick: async (row: SvcRecord) => { setLoading(true); await delay(500); db = db.map((s) => s.id === row.id ? { ...s, last_health_check: new Date().toISOString() } : s); await runList(); } },
 	], [runList]);
 	return (<GenericTable<SvcRecord> columns={columns} data={rows} filters={filterConfig} rowActions={rowActions} showRowActions onFilter={handleFilter} onReset={handleReset} loading={loading} emptyMessage="No services found" pagination={{ currentPage: page, totalPages, totalItems, itemsPerPage, onPageChange: setPage, onItemsPerPageChange: handleItemsPerPageChange }} />);

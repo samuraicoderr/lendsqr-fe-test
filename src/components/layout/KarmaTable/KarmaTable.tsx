@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import FrontendLinks from "@/lib/FrontendLinks";
 import GenericTable, { Column, FilterConfig, FilterValues, RowAction } from "@/components/layout/GenericTable/GenericTable";
 import StatusPill from "@/components/ui/StatusPill";
 
@@ -54,6 +56,7 @@ const listKarma = async ({ filters, page, pageSize }: ListParams): Promise<ListR
 };
 
 export default function KarmaTable() {
+	const router = useRouter();
 	const [rows, setRows] = useState<KarmaRecord[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [page, setPage] = useState(1);
@@ -106,7 +109,7 @@ export default function KarmaTable() {
 	const handleItemsPerPageChange = useCallback((n: number) => { setItemsPerPage(n); setPage(1); }, []);
 
 	const rowActions: RowAction[] = useMemo(() => [
-		{ id: "view", label: "View Profile", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: KarmaRecord) => { console.log("View karma:", row.id); } },
+		{ id: "view", label: "View Profile", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: KarmaRecord) => { router.push(FrontendLinks.userDetails(row.id)); } },
 		{ id: "blacklist", label: "Blacklist User", icon: <img src="/media/icons/userx.svg" alt="" width={16} height={16} />, onClick: async (row: KarmaRecord) => { setLoading(true); db = db.map((k) => k.id === row.id ? { ...k, blacklist_status: "Blacklisted", karma_score: 0 } : k); await runList(); } },
 	], [runList]);
 

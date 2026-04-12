@@ -1,0 +1,102 @@
+@use "sass:color";
+@use "../../../styles/variables" as v;
+
+$color-primary: v.$color-primary;
+$color-secondary: v.$color-secondary;
+$color-danger: v.$color-danger;
+$color-white: v.$color-white;
+$color-accent: v.$color-accent;
+$font-family: v.$font-family-base;
+$transition-fast: v.$transition-fast;
+
+.overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.4);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 10000;
+	animation: fadeIn 0.2s ease-out;
+}
+
+.modal {
+	background: $color-white;
+	border-radius: 12px;
+	padding: 30px;
+	width: 90%;
+	max-width: 440px;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+	animation: scaleIn 0.2s ease-out;
+}
+
+.title {
+	font-family: $font-family;
+	font-size: 20px;
+	font-weight: 600;
+	color: $color-primary;
+	margin: 0 0 12px;
+}
+
+.message {
+	font-family: $font-family;
+	font-size: 14px;
+	line-height: 22px;
+	color: $color-secondary;
+	margin: 0 0 24px;
+}
+
+.actions {
+	display: flex;
+	gap: 12px;
+	justify-content: flex-end;
+}
+
+.cancelBtn {
+	height: 40px;
+	padding: 0 24px;
+	border-radius: 8px;
+	font-family: $font-family;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	background: transparent;
+	border: 1px solid rgba($color-secondary, 0.3);
+	color: $color-secondary;
+	transition: all $transition-fast;
+
+	&:hover { background: rgba($color-secondary, 0.05); }
+}
+
+.confirmBtn {
+	height: 40px;
+	padding: 0 24px;
+	border-radius: 8px;
+	font-family: $font-family;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	border: none;
+	color: $color-white;
+	transition: all $transition-fast;
+
+	&.danger { background: $color-danger; &:hover { background: color.adjust($color-danger, $lightness: -5%); } }
+	&.primary { background: $color-accent; &:hover { background: color.adjust($color-accent, $lightness: -5%); } }
+	&.success { background: #39CD62; &:hover { background: color.adjust(#39CD62, $lightness: -5%); } }
+
+	&:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+@keyframes fadeIn {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+	from { opacity: 0; transform: scale(0.95); }
+	to { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.overlay, .modal { animation: none; }
+}

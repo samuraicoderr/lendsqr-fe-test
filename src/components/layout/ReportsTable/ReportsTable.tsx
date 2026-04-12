@@ -1,5 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import FrontendLinks from "@/lib/FrontendLinks";
 import GenericTable, { Column, FilterConfig, FilterValues, RowAction } from "@/components/layout/GenericTable/GenericTable";
 import StatusPill from "@/components/ui/StatusPill";
 
@@ -28,6 +30,7 @@ const listRpt = async ({ filters, page, pageSize }: ListParams): Promise<ListRes
 	return { rows: filtered.slice(start, start + pageSize), totalPages: tp, totalItems: filtered.length };
 };
 export default function ReportsTable() {
+	const router = useRouter();
 	const [rows, setRows] = useState<RptRecord[]>([]); const [loading, setLoading] = useState(true); const [page, setPage] = useState(1); const [itemsPerPage, setItemsPerPage] = useState(PAGE_SIZE); const [totalPages, setTotalPages] = useState(1); const [totalItems, setTotalItems] = useState(0); const [filters, setFilters] = useState<FilterValues>({});
 	const runList = useCallback(async () => { setLoading(true); try { const res = await listRpt({ filters, page, pageSize: itemsPerPage }); setRows(res.rows); setTotalPages(res.totalPages); setTotalItems(res.totalItems); } finally { setLoading(false); } }, [filters, itemsPerPage, page]);
 	useEffect(() => { runList(); }, [runList]);
@@ -51,7 +54,7 @@ export default function ReportsTable() {
 	const handleReset = useCallback(() => { setPage(1); setFilters({}); }, []);
 	const handleItemsPerPageChange = useCallback((n: number) => { setItemsPerPage(n); setPage(1); }, []);
 	const rowActions: RowAction[] = useMemo(() => [
-		{ id: "view", label: "View Report", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: RptRecord) => { console.log("View:", row.id); } },
+		{ id: "view", label: "View Report", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: RptRecord) => { router.push(FrontendLinks.reportDetails(row.id)); } },
 		{ id: "run", label: "Run Now", icon: <img src="/media/icons/sliders.svg" alt="" width={16} height={16} />, onClick: async (row: RptRecord) => { setLoading(true); db = db.map((r) => r.id === row.id ? { ...r, last_generated: new Date().toISOString().slice(0, 10) } : r); await runList(); } },
 	], [runList]);
 	return (<GenericTable<RptRecord> columns={columns} data={rows} filters={filterConfig} rowActions={rowActions} showRowActions onFilter={handleFilter} onReset={handleReset} loading={loading} emptyMessage="No reports found" pagination={{ currentPage: page, totalPages, totalItems, itemsPerPage, onPageChange: setPage, onItemsPerPageChange: handleItemsPerPageChange }} />);

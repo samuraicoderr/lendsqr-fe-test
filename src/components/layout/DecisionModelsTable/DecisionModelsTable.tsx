@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import FrontendLinks from "@/lib/FrontendLinks";
 import GenericTable, { Column, FilterConfig, FilterValues, RowAction } from "@/components/layout/GenericTable/GenericTable";
 import StatusPill from "@/components/ui/StatusPill";
 
@@ -54,6 +56,7 @@ const listDecisionModels = async ({ filters, page, pageSize }: ListParams): Prom
 };
 
 export default function DecisionModelsTable() {
+	const router = useRouter();
 	const [rows, setRows] = useState<DecisionModelRecord[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [page, setPage] = useState(1);
@@ -98,7 +101,7 @@ export default function DecisionModelsTable() {
 	const handleItemsPerPageChange = useCallback((n: number) => { setItemsPerPage(n); setPage(1); }, []);
 
 	const rowActions: RowAction[] = useMemo(() => [
-		{ id: "view", label: "View Details", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: DecisionModelRecord) => { console.log("View model:", row.id); } },
+		{ id: "view", label: "View Details", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: DecisionModelRecord) => { router.push(FrontendLinks.decisionModelDetails(row.id)); } },
 		{ id: "toggle", label: "Toggle Status", icon: <img src="/media/icons/sliders.svg" alt="" width={16} height={16} />, onClick: async (row: DecisionModelRecord) => { setLoading(true); db = db.map((m) => m.id === row.id ? { ...m, status: m.status === "Active" ? "Inactive" : "Active" } : m); await runList(); } },
 	], [runList]);
 

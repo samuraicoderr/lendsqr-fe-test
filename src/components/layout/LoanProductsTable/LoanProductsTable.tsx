@@ -1,5 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import FrontendLinks from "@/lib/FrontendLinks";
 import GenericTable, { Column, FilterConfig, FilterValues, RowAction } from "@/components/layout/GenericTable/GenericTable";
 
 type LPRecord = { id: string; name: string; code: string; organization: string; interest_rate: string; min_amount: number; max_amount: number; tenure_range: string; requires_guarantor: string; status: string; date: string };
@@ -26,6 +28,7 @@ const listLP = async ({ filters, page, pageSize }: ListParams): Promise<ListResp
 	return { rows: filtered.slice(start, start + pageSize), totalPages: tp, totalItems: filtered.length };
 };
 export default function LoanProductsTable() {
+	const router = useRouter();
 	const [rows, setRows] = useState<LPRecord[]>([]); const [loading, setLoading] = useState(true); const [page, setPage] = useState(1); const [itemsPerPage, setItemsPerPage] = useState(PAGE_SIZE); const [totalPages, setTotalPages] = useState(1); const [totalItems, setTotalItems] = useState(0); const [filters, setFilters] = useState<FilterValues>({});
 	const runList = useCallback(async () => { setLoading(true); try { const res = await listLP({ filters, page, pageSize: itemsPerPage }); setRows(res.rows); setTotalPages(res.totalPages); setTotalItems(res.totalItems); } finally { setLoading(false); } }, [filters, itemsPerPage, page]);
 	useEffect(() => { runList(); }, [runList]);
@@ -50,7 +53,7 @@ export default function LoanProductsTable() {
 	const handleReset = useCallback(() => { setPage(1); setFilters({}); }, []);
 	const handleItemsPerPageChange = useCallback((n: number) => { setItemsPerPage(n); setPage(1); }, []);
 	const rowActions: RowAction[] = useMemo(() => [
-		{ id: "view", label: "View Details", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: LPRecord) => { console.log("View product:", row.id); } },
+		{ id: "view", label: "View Details", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: LPRecord) => { router.push(FrontendLinks.loanProductDetails(row.id)); } },
 		{ id: "toggle", label: "Toggle Status", icon: <img src="/media/icons/sliders.svg" alt="" width={16} height={16} />, onClick: async (row: LPRecord) => { setLoading(true); db = db.map((p) => p.id === row.id ? { ...p, status: p.status === "Active" ? "Inactive" : "Active" } : p); await runList(); } },
 	], [runList]);
 	return (<GenericTable<LPRecord> columns={columns} data={rows} filters={filterConfig} rowActions={rowActions} showRowActions onFilter={handleFilter} onReset={handleReset} loading={loading} emptyMessage="No loan products found" pagination={{ currentPage: page, totalPages, totalItems, itemsPerPage, onPageChange: setPage, onItemsPerPageChange: handleItemsPerPageChange }} />);

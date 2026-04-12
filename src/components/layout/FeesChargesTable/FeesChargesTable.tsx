@@ -1,5 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import FrontendLinks from "@/lib/FrontendLinks";
 import GenericTable, { Column, FilterConfig, FilterValues, RowAction } from "@/components/layout/GenericTable/GenericTable";
 import StatusPill from "@/components/ui/StatusPill";
 
@@ -28,6 +30,7 @@ const listFC = async ({ filters, page, pageSize }: ListParams): Promise<ListResp
 	return { rows: filtered.slice(start, start + pageSize), totalPages: tp, totalItems: filtered.length };
 };
 export default function FeesChargesTable() {
+	const router = useRouter();
 	const [rows, setRows] = useState<FCRecord[]>([]); const [loading, setLoading] = useState(true); const [page, setPage] = useState(1); const [itemsPerPage, setItemsPerPage] = useState(PAGE_SIZE); const [totalPages, setTotalPages] = useState(1); const [totalItems, setTotalItems] = useState(0); const [filters, setFilters] = useState<FilterValues>({});
 	const runList = useCallback(async () => { setLoading(true); try { const res = await listFC({ filters, page, pageSize: itemsPerPage }); setRows(res.rows); setTotalPages(res.totalPages); setTotalItems(res.totalItems); } finally { setLoading(false); } }, [filters, itemsPerPage, page]);
 	useEffect(() => { runList(); }, [runList]);
@@ -51,7 +54,7 @@ export default function FeesChargesTable() {
 	const handleReset = useCallback(() => { setPage(1); setFilters({}); }, []);
 	const handleItemsPerPageChange = useCallback((n: number) => { setItemsPerPage(n); setPage(1); }, []);
 	const rowActions: RowAction[] = useMemo(() => [
-		{ id: "view", label: "View Details", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: FCRecord) => { console.log("View:", row.id); } },
+		{ id: "view", label: "View Details", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: FCRecord) => { router.push(FrontendLinks.feeDetails(row.id)); } },
 		{ id: "toggle", label: "Toggle Status", icon: <img src="/media/icons/sliders.svg" alt="" width={16} height={16} />, onClick: async (row: FCRecord) => { setLoading(true); db = db.map((f) => f.id === row.id ? { ...f, status: f.status === "Active" ? "Inactive" : "Active" } : f); await runList(); } },
 	], [runList]);
 	return (<GenericTable<FCRecord> columns={columns} data={rows} filters={filterConfig} rowActions={rowActions} showRowActions onFilter={handleFilter} onReset={handleReset} loading={loading} emptyMessage="No fees or charges found" pagination={{ currentPage: page, totalPages, totalItems, itemsPerPage, onPageChange: setPage, onItemsPerPageChange: handleItemsPerPageChange }} />);

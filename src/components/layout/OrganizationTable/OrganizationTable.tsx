@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import FrontendLinks from "@/lib/FrontendLinks";
 import GenericTable, { Column, FilterConfig, FilterValues, RowAction } from "@/components/layout/GenericTable/GenericTable";
 
 type OrgRecord = { id: string; name: string; email: string; phone: string; industry: string; registration_number: string; state: string; status: string; date: string };
@@ -41,6 +43,7 @@ const listOrganizations = async ({ filters, page, pageSize }: ListParams): Promi
 };
 
 export default function OrganizationTable() {
+	const router = useRouter();
 	const [rows, setRows] = useState<OrgRecord[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [page, setPage] = useState(1);
@@ -79,7 +82,7 @@ export default function OrganizationTable() {
 	const handleItemsPerPageChange = useCallback((n: number) => { setItemsPerPage(n); setPage(1); }, []);
 
 	const rowActions: RowAction[] = useMemo(() => [
-		{ id: "view", label: "View Details", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: OrgRecord) => { console.log("View org:", row.id); } },
+		{ id: "view", label: "View Details", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: OrgRecord) => { router.push(FrontendLinks.organizationDetails(row.id)); } },
 		{ id: "suspend", label: "Suspend", icon: <img src="/media/icons/user-times.svg" alt="" width={16} height={16} />, onClick: async (row: OrgRecord) => { setLoading(true); db = db.map((o) => o.id === row.id ? { ...o, status: "Suspended" } : o); await runList(); } },
 		{ id: "activate", label: "Activate", icon: <img src="/media/icons/user-activate.svg" alt="" width={16} height={16} />, onClick: async (row: OrgRecord) => { setLoading(true); db = db.map((o) => o.id === row.id ? { ...o, status: "Active" } : o); await runList(); } },
 	], [runList]);

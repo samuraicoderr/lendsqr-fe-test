@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import FrontendLinks from "@/lib/FrontendLinks";
 import GenericTable, { Column, FilterConfig, FilterValues, RowAction } from "@/components/layout/GenericTable/GenericTable";
 import StatusPill from "@/components/ui/StatusPill";
 
@@ -57,6 +59,7 @@ const listLoanRequests = async ({ filters, page, pageSize }: ListParams): Promis
 };
 
 export default function LoanRequestsTable() {
+	const router = useRouter();
 	const [rows, setRows] = useState<LoanRequestRecord[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [page, setPage] = useState(1);
@@ -101,7 +104,7 @@ export default function LoanRequestsTable() {
 	const handleItemsPerPageChange = useCallback((n: number) => { setItemsPerPage(n); setPage(1); }, []);
 
 	const rowActions: RowAction[] = useMemo(() => [
-		{ id: "view", label: "View Details", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: LoanRequestRecord) => { console.log("View request:", row.id); } },
+		{ id: "view", label: "View Details", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: LoanRequestRecord) => { router.push(FrontendLinks.loanRequestDetails(row.id)); } },
 		{ id: "approve", label: "Approve", icon: <img src="/media/icons/user-check.svg" alt="" width={16} height={16} />, onClick: async (row: LoanRequestRecord) => { setLoading(true); db = db.map((r) => r.id === row.id ? { ...r, decision_status: "Approved", approved_amount: r.requested_amount } : r); await runList(); } },
 		{ id: "reject", label: "Reject", icon: <img src="/media/icons/user-times.svg" alt="" width={16} height={16} />, onClick: async (row: LoanRequestRecord) => { setLoading(true); db = db.map((r) => r.id === row.id ? { ...r, decision_status: "Rejected" } : r); await runList(); } },
 	], [runList]);

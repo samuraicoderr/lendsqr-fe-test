@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import FrontendLinks from "@/lib/FrontendLinks";
 import GenericTable, { Column, FilterConfig, FilterValues, RowAction } from "@/components/layout/GenericTable/GenericTable";
 import StatusPill from "@/components/ui/StatusPill";
 
@@ -57,6 +59,7 @@ const listGuarantors = async ({ filters, page, pageSize }: ListParams): Promise<
 };
 
 export default function GuarantorsTable() {
+	const router = useRouter();
 	const [rows, setRows] = useState<GuarantorRecord[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [page, setPage] = useState(1);
@@ -103,7 +106,7 @@ export default function GuarantorsTable() {
 	const handleItemsPerPageChange = useCallback((n: number) => { setItemsPerPage(n); setPage(1); }, []);
 
 	const rowActions: RowAction[] = useMemo(() => [
-		{ id: "view", label: "View Details", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: GuarantorRecord) => { console.log("View guarantor:", row.id); } },
+		{ id: "view", label: "View Details", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: GuarantorRecord) => { router.push(FrontendLinks.guarantorDetails(row.id)); } },
 		{ id: "verify", label: "Verify", icon: <img src="/media/icons/user-check.svg" alt="" width={16} height={16} />, onClick: async (row: GuarantorRecord) => { setLoading(true); db = db.map((g) => g.id === row.id ? { ...g, verification_status: "Verified" } : g); await runList(); } },
 		{ id: "deactivate", label: "Deactivate", icon: <img src="/media/icons/user-times.svg" alt="" width={16} height={16} />, onClick: async (row: GuarantorRecord) => { setLoading(true); db = db.map((g) => g.id === row.id ? { ...g, verification_status: "Expired" } : g); await runList(); } },
 	], [runList]);

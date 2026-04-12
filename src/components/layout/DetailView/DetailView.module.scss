@@ -1,0 +1,712 @@
+@use "sass:color";
+@use "../../../styles/variables" as v;
+
+$color-primary: v.$color-primary;
+$color-secondary: v.$color-secondary;
+$color-accent: v.$color-accent;
+$color-danger: v.$color-danger;
+$color-success: #39CD62;
+$color-warning: #E9B200;
+$color-white: v.$color-white;
+$color-border: v.$color-border;
+$color-divider: v.$color-divider;
+$font-family: v.$font-family-base;
+$shadow-card: v.$shadow-md;
+$transition-fast: v.$transition-fast;
+
+// ========== CONTAINER ==========
+.container {
+	width: 100%;
+	max-width: 1537px;
+	padding-bottom: 40px;
+}
+
+// ========== BACK LINK ==========
+.backButton {
+	display: flex;
+	align-items: center;
+	width: fit-content;
+	gap: 10px;
+	background: none;
+	border: none;
+	cursor: pointer;
+	color: $color-secondary;
+	font-family: $font-family;
+	font-size: 16px;
+	font-weight: 400;
+	line-height: 19px;
+	margin-bottom: 20px;
+	padding: 0;
+	text-decoration: none;
+	transition: color $transition-fast;
+
+	&:hover { color: $color-primary; }
+}
+
+.backIcon {
+	width: 28px;
+	height: 28px;
+	object-fit: contain;
+}
+
+// ========== HEADER ROW ==========
+.headerRow {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	margin-bottom: 30px;
+
+	@media (width <= 768px) {
+		flex-direction: column;
+		align-items: stretch;
+		margin-bottom: 20px;
+	}
+}
+
+.pageTitle {
+	font-family: $font-family;
+	font-size: 24px;
+	font-weight: 500;
+	line-height: 28px;
+	color: $color-primary;
+	margin: 0;
+}
+
+// ========== ACTION BUTTONS ==========
+.actionButtons {
+	display: flex;
+	gap: 14px;
+	flex-wrap: wrap;
+
+	@media (width <= 768px) {
+		flex-direction: column;
+	}
+}
+
+.btnBase {
+	height: 40px;
+	padding: 0 20px;
+	border-radius: 8px;
+	font-family: $font-family;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 16px;
+	text-align: center;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	cursor: pointer;
+	transition: all $transition-fast;
+	white-space: nowrap;
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+}
+
+.btnPrimary {
+	@extend .btnBase;
+	background: $color-accent;
+	border: none;
+	color: $color-white;
+
+	&:hover:not(:disabled) {
+		background: color.adjust($color-accent, $lightness: -5%);
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba($color-accent, 0.3);
+	}
+}
+
+.btnOutlinePrimary {
+	@extend .btnBase;
+	background: transparent;
+	border: 1px solid $color-accent;
+	color: $color-accent;
+
+	&:hover:not(:disabled) { background: rgba($color-accent, 0.05); }
+}
+
+.btnDanger {
+	@extend .btnBase;
+	background: transparent;
+	border: 1px solid $color-danger;
+	color: $color-danger;
+
+	&:hover:not(:disabled) { background: rgba($color-danger, 0.05); }
+}
+
+.btnSuccess {
+	@extend .btnBase;
+	background: transparent;
+	border: 1px solid $color-success;
+	color: $color-success;
+
+	&:hover:not(:disabled) { background: rgba($color-success, 0.05); }
+}
+
+.btnWarning {
+	@extend .btnBase;
+	background: transparent;
+	border: 1px solid $color-warning;
+	color: $color-warning;
+
+	&:hover:not(:disabled) { background: rgba($color-warning, 0.05); }
+}
+
+.btnSecondary {
+	@extend .btnBase;
+	background: transparent;
+	border: 1px solid rgba($color-secondary, 0.4);
+	color: $color-secondary;
+
+	&:hover:not(:disabled) { background: rgba($color-secondary, 0.05); }
+}
+
+// ========== SUMMARY CARD ==========
+.summaryCard {
+	background: $color-white;
+	border: 1px solid $color-border;
+	box-shadow: $shadow-card;
+	border-radius: 4px;
+	margin-bottom: 30px;
+	overflow: hidden;
+}
+
+.summaryHeader {
+	display: flex;
+	align-items: center;
+	padding: 30px 30px 0;
+	gap: 20px;
+	flex-wrap: wrap;
+
+	@media (width <= 768px) {
+		flex-direction: column;
+		text-align: center;
+	}
+}
+
+.avatar {
+	flex-shrink: 0;
+}
+
+.avatarPlaceholder {
+	width: 100px;
+	height: 100px;
+	background: rgba($color-primary, 0.16);
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.avatarIcon {
+	width: 52px;
+	height: 52px;
+	object-fit: contain;
+}
+
+.avatarSmall {
+	width: 48px;
+	height: 48px;
+	background: rgba($color-accent, 0.1);
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	font-family: $font-family;
+	font-size: 18px;
+	font-weight: 600;
+	color: $color-accent;
+}
+
+.nameSection {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.entityName {
+	font-family: $font-family;
+	font-size: 22px;
+	font-weight: 500;
+	line-height: 26px;
+	color: $color-primary;
+	margin: 0;
+}
+
+.entityId {
+	font-family: $font-family;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 16px;
+	color: $color-secondary;
+}
+
+.verticalDivider {
+	width: 80px;
+	height: 0;
+	border: 1px solid $color-secondary;
+	opacity: 0.2;
+	transform: rotate(90deg);
+	margin: 0 10px;
+
+	@media (width <= 768px) { display: none; }
+}
+
+.summaryMeta {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.metaLabel {
+	font-family: $font-family;
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 14px;
+	text-transform: uppercase;
+	color: $color-secondary;
+}
+
+.metaValue {
+	font-family: $font-family;
+	font-size: 18px;
+	font-weight: 500;
+	line-height: 22px;
+	color: $color-primary;
+}
+
+.metaValueLarge {
+	font-family: $font-family;
+	font-size: 22px;
+	font-weight: 600;
+	line-height: 26px;
+	color: $color-primary;
+}
+
+// ========== TABS ==========
+.tabs {
+	display: flex;
+	gap: 0;
+	margin-top: 30px;
+	padding: 0 30px;
+	overflow-x: auto;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+
+.tab {
+	position: relative;
+	padding: 12px 25px;
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-family: $font-family;
+	font-size: 16px;
+	font-weight: 400;
+	line-height: 19px;
+	text-align: center;
+	color: rgb(0 0 0 / 80%);
+	white-space: nowrap;
+	transition: color $transition-fast;
+
+	&:hover { color: $color-accent; }
+}
+
+.tabActive {
+	color: $color-accent;
+}
+
+.tabIndicator {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 2px;
+	background: $color-accent;
+}
+
+// ========== DETAILS CARD ==========
+.detailsCard {
+	background: $color-white;
+	border: 1px solid $color-border;
+	box-shadow: $shadow-card;
+	border-radius: 4px;
+	padding: 30px;
+	min-height: 400px;
+}
+
+.section {
+	margin-bottom: 10px;
+}
+
+.sectionTitle {
+	font-family: $font-family;
+	font-size: 16px;
+	font-weight: 500;
+	line-height: 19px;
+	color: $color-primary;
+	margin: 0 0 25px;
+}
+
+.infoGrid {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	gap: 30px 20px;
+
+	@media (width <= 1024px) { grid-template-columns: repeat(3, 1fr); }
+	@media (width <= 768px) { grid-template-columns: repeat(2, 1fr); }
+	@media (width <= 480px) { grid-template-columns: 1fr; }
+}
+
+.infoItem {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.infoLabel {
+	font-family: $font-family;
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 14px;
+	text-transform: uppercase;
+	color: $color-secondary;
+}
+
+.infoValue {
+	font-family: $font-family;
+	font-size: 16px;
+	font-weight: 500;
+	line-height: 19px;
+	color: $color-secondary;
+	overflow-wrap: anywhere;
+}
+
+.sectionDivider {
+	height: 0;
+	border: 1px solid $color-divider;
+	opacity: 0.1;
+	margin: 25px 0;
+}
+
+// ========== PROGRESS BAR ==========
+.progressContainer {
+	width: 100%;
+	margin: 16px 0;
+}
+
+.progressLabel {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 8px;
+	font-family: $font-family;
+	font-size: 14px;
+	color: $color-secondary;
+}
+
+.progressTrack {
+	width: 100%;
+	height: 8px;
+	background: rgba($color-primary, 0.08);
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.progressFill {
+	height: 100%;
+	border-radius: 4px;
+	background: $color-accent;
+	transition: width 0.6s ease-out;
+
+	&.danger { background: $color-danger; }
+	&.warning { background: $color-warning; }
+	&.success { background: $color-success; }
+}
+
+// ========== TIMELINE ==========
+.timeline {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	padding: 0;
+	list-style: none;
+	margin: 0;
+}
+
+.timelineItem {
+	display: flex;
+	gap: 16px;
+	position: relative;
+	padding-bottom: 24px;
+
+	&:last-child { padding-bottom: 0; }
+	&:last-child .timelineLine { display: none; }
+}
+
+.timelineDot {
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	background: $color-accent;
+	flex-shrink: 0;
+	margin-top: 4px;
+	position: relative;
+	z-index: 1;
+
+	&.success { background: $color-success; }
+	&.danger { background: $color-danger; }
+	&.warning { background: $color-warning; }
+	&.muted { background: rgba($color-secondary, 0.3); }
+}
+
+.timelineLine {
+	position: absolute;
+	left: 5px;
+	top: 16px;
+	width: 2px;
+	bottom: 0;
+	background: rgba($color-primary, 0.08);
+}
+
+.timelineContent {
+	flex: 1;
+}
+
+.timelineTitle {
+	font-family: $font-family;
+	font-size: 14px;
+	font-weight: 600;
+	color: $color-primary;
+	margin: 0 0 4px;
+}
+
+.timelineDescription {
+	font-family: $font-family;
+	font-size: 13px;
+	color: $color-secondary;
+	margin: 0 0 4px;
+}
+
+.timelineDate {
+	font-family: $font-family;
+	font-size: 12px;
+	color: rgba($color-secondary, 0.6);
+}
+
+// ========== MINI TABLE ==========
+.miniTable {
+	width: 100%;
+	border-collapse: collapse;
+	font-family: $font-family;
+
+	th, td {
+		padding: 12px 16px;
+		text-align: left;
+		font-size: 14px;
+	}
+
+	th {
+		font-weight: 600;
+		font-size: 12px;
+		text-transform: uppercase;
+		color: $color-secondary;
+		background: rgba($color-primary, 0.02);
+		border-bottom: 1px solid $color-border;
+	}
+
+	td {
+		color: $color-secondary;
+		border-bottom: 1px solid rgba($color-primary, 0.04);
+	}
+
+	tr:hover td {
+		background: rgba($color-primary, 0.02);
+	}
+}
+
+// ========== CARD GRID ==========
+.cardGrid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 16px;
+
+	@media (width <= 1024px) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	@media (width <= 640px) { grid-template-columns: 1fr; }
+}
+
+.infoCard {
+	border: 1px solid $color-divider;
+	border-radius: 8px;
+	padding: 20px;
+	background: rgba($color-primary, 0.02);
+	transition: all $transition-fast;
+
+	&:hover {
+		border-color: rgba($color-accent, 0.3);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+	}
+}
+
+.infoCardTitle {
+	margin: 0 0 8px;
+	font-family: $font-family;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 18px;
+	color: $color-primary;
+}
+
+.infoCardMeta {
+	margin: 0;
+	font-family: $font-family;
+	font-size: 13px;
+	font-weight: 400;
+	line-height: 18px;
+	color: $color-secondary;
+}
+
+// ========== CONTENT BLOCK ==========
+.contentBlock {
+	background: rgba($color-primary, 0.02);
+	border: 1px solid rgba($color-primary, 0.06);
+	border-radius: 8px;
+	padding: 24px;
+	font-family: $font-family;
+	font-size: 14px;
+	line-height: 22px;
+	color: $color-secondary;
+	white-space: pre-wrap;
+}
+
+// ========== STAT ROW ==========
+.statRow {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 16px;
+	margin-bottom: 24px;
+
+	@media (width <= 768px) { grid-template-columns: repeat(2, 1fr); }
+	@media (width <= 480px) { grid-template-columns: 1fr; }
+}
+
+.statItem {
+	text-align: center;
+	padding: 16px;
+	background: rgba($color-primary, 0.02);
+	border: 1px solid rgba($color-primary, 0.06);
+	border-radius: 8px;
+}
+
+.statValue {
+	font-family: $font-family;
+	font-size: 24px;
+	font-weight: 600;
+	color: $color-primary;
+	display: block;
+	margin-bottom: 4px;
+}
+
+.statLabel {
+	font-family: $font-family;
+	font-size: 12px;
+	text-transform: uppercase;
+	color: $color-secondary;
+}
+
+// ========== SKELETON ==========
+.skeleton {
+	display: flex;
+	flex-direction: column;
+	gap: 30px;
+}
+
+.skeletonHeader, .skeletonCard, .skeletonContent {
+	background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+	background-size: 200% 100%;
+	animation: shimmer 1.5s infinite;
+	border-radius: 4px;
+}
+
+.skeletonHeader { height: 30px; width: 200px; }
+.skeletonCard { height: 210px; }
+.skeletonContent { height: 400px; }
+
+@keyframes shimmer {
+	0% { background-position: 200% 0; }
+	100% { background-position: -200% 0; }
+}
+
+// ========== ERROR ==========
+.error {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 60px 20px;
+	gap: 16px;
+	color: $color-secondary;
+	font-family: $font-family;
+
+	button {
+		padding: 12px 24px;
+		background: $color-primary;
+		color: white;
+		border: none;
+		border-radius: 8px;
+		cursor: pointer;
+		font-family: $font-family;
+		font-weight: 500;
+
+		&:hover { background: color.adjust($color-primary, $lightness: -5%); }
+	}
+}
+
+// ========== TOAST ==========
+.toast {
+	position: fixed;
+	bottom: 30px;
+	right: 30px;
+	padding: 14px 24px;
+	border-radius: 8px;
+	font-family: $font-family;
+	font-size: 14px;
+	font-weight: 500;
+	color: $color-white;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+	animation: slideInToast 0.3s ease-out;
+	z-index: 9999;
+
+	&.success { background: $color-success; }
+	&.danger { background: $color-danger; }
+	&.warning { background: $color-warning; }
+}
+
+@keyframes slideInToast {
+	from { opacity: 0; transform: translateY(20px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+// ========== EMPTY STATE ==========
+.emptyState {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 40px 20px;
+	color: $color-secondary;
+	font-family: $font-family;
+	font-size: 14px;
+	text-align: center;
+}
+
+// ========== REDUCED MOTION ==========
+@media (prefers-reduced-motion: reduce) {
+	.skeletonHeader, .skeletonCard, .skeletonContent {
+		animation: none;
+	}
+	.toast { animation: none; }
+	.progressFill { transition: none; }
+}

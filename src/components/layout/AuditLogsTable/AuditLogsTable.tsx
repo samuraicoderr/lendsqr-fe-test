@@ -1,6 +1,8 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import GenericTable, { Column, FilterConfig, FilterValues } from "@/components/layout/GenericTable/GenericTable";
+import { useRouter } from "next/navigation";
+import FrontendLinks from "@/lib/FrontendLinks";
+import GenericTable, { Column, FilterConfig, FilterValues, RowAction } from "@/components/layout/GenericTable/GenericTable";
 
 type AuditRecord = { id: string; actor_email: string; action: string; entity_type: string; entity_id: string; ip_address: string; user_agent: string; changes_summary: string; date: string };
 type ListParams = { filters: FilterValues; page: number; pageSize: number };
@@ -28,6 +30,7 @@ const listAudit = async ({ filters, page, pageSize }: ListParams): Promise<ListR
 	return { rows: filtered.slice(start, start + pageSize), totalPages: tp, totalItems: filtered.length };
 };
 export default function AuditLogsTable() {
+	const router = useRouter();
 	const [rows, setRows] = useState<AuditRecord[]>([]); const [loading, setLoading] = useState(true); const [page, setPage] = useState(1); const [itemsPerPage, setItemsPerPage] = useState(PAGE_SIZE); const [totalPages, setTotalPages] = useState(1); const [totalItems, setTotalItems] = useState(0); const [filters, setFilters] = useState<FilterValues>({});
 	const runList = useCallback(async () => { setLoading(true); try { const res = await listAudit({ filters, page, pageSize: itemsPerPage }); setRows(res.rows); setTotalPages(res.totalPages); setTotalItems(res.totalItems); } finally { setLoading(false); } }, [filters, itemsPerPage, page]);
 	useEffect(() => { runList(); }, [runList]);
@@ -48,5 +51,8 @@ export default function AuditLogsTable() {
 	const handleFilter = useCallback((f: FilterValues) => { setPage(1); setFilters(f); }, []);
 	const handleReset = useCallback(() => { setPage(1); setFilters({}); }, []);
 	const handleItemsPerPageChange = useCallback((n: number) => { setItemsPerPage(n); setPage(1); }, []);
-	return (<GenericTable<AuditRecord> columns={columns} data={rows} filters={filterConfig} onFilter={handleFilter} onReset={handleReset} loading={loading} emptyMessage="No audit logs found" pagination={{ currentPage: page, totalPages, totalItems, itemsPerPage, onPageChange: setPage, onItemsPerPageChange: handleItemsPerPageChange }} />);
+	const rowActions: RowAction[] = useMemo(() => [
+		{ id: "view", label: "View Details", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: AuditRecord) => { router.push(FrontendLinks.auditLogDetails(row.id)); } },
+	], [router]);
+	return (<GenericTable<AuditRecord> columns={columns} data={rows} filters={filterConfig} rowActions={rowActions} showRowActions onFilter={handleFilter} onReset={handleReset} loading={loading} emptyMessage="No audit logs found" pagination={{ currentPage: page, totalPages, totalItems, itemsPerPage, onPageChange: setPage, onItemsPerPageChange: handleItemsPerPageChange }} />);
 }
