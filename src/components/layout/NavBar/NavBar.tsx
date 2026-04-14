@@ -28,7 +28,7 @@ const Navbar: React.FC<NavbarProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [notificationCount] = useState(0);
+  const [notificationCount] = useState(4);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Handle click outside to close dropdown
@@ -117,6 +117,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
           {/* Notification Bell */}
           <button 
+            type="button"
             className={styles.notificationButton}
             onClick={onNotificationClick}
             aria-label={`Notifications${notificationCount > 0 ? ` (${notificationCount} unread)` : ''}`}

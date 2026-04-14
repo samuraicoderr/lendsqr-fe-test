@@ -112,6 +112,7 @@ export default function SavingsTable() {
 		<GenericTable<SavingsRecord>
 			columns={columns} data={rows} filters={filterConfig} rowActions={rowActions} showRowActions
 			onFilter={handleFilter} onReset={handleReset} loading={loading} emptyMessage="No savings accounts found"
+			onRowClick={(row) => router.push(FrontendLinks.savingsDetails(row.id))}
 			pagination={{ currentPage: page, totalPages, totalItems, itemsPerPage, onPageChange: setPage, onItemsPerPageChange: handleItemsPerPageChange }}
 		/>
 	);

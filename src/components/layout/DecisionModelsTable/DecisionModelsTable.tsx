@@ -109,6 +109,7 @@ export default function DecisionModelsTable() {
 		<GenericTable<DecisionModelRecord>
 			columns={columns} data={rows} filters={filterConfig} rowActions={rowActions} showRowActions
 			onFilter={handleFilter} onReset={handleReset} loading={loading} emptyMessage="No decision models found"
+			onRowClick={(row) => router.push(FrontendLinks.decisionModelDetails(row.id))}
 			pagination={{ currentPage: page, totalPages, totalItems, itemsPerPage, onPageChange: setPage, onItemsPerPageChange: handleItemsPerPageChange }}
 		/>
 	);

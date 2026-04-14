@@ -54,5 +54,5 @@ export default function AuditLogsTable() {
 	const rowActions: RowAction[] = useMemo(() => [
 		{ id: "view", label: "View Details", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: AuditRecord) => { router.push(FrontendLinks.auditLogDetails(row.id)); } },
 	], [router]);
-	return (<GenericTable<AuditRecord> columns={columns} data={rows} filters={filterConfig} rowActions={rowActions} showRowActions onFilter={handleFilter} onReset={handleReset} loading={loading} emptyMessage="No audit logs found" pagination={{ currentPage: page, totalPages, totalItems, itemsPerPage, onPageChange: setPage, onItemsPerPageChange: handleItemsPerPageChange }} />);
+	return (<GenericTable<AuditRecord> columns={columns} data={rows} filters={filterConfig} rowActions={rowActions} showRowActions onFilter={handleFilter} onReset={handleReset} loading={loading} emptyMessage="No audit logs found" onRowClick={(row) => router.push(FrontendLinks.auditLogDetails(row.id))} pagination={{ currentPage: page, totalPages, totalItems, itemsPerPage, onPageChange: setPage, onItemsPerPageChange: handleItemsPerPageChange }} />);
 }

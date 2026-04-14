@@ -91,6 +91,7 @@ export default function OrganizationTable() {
 		<GenericTable<OrgRecord>
 			columns={columns} data={rows} filters={filterConfig} rowActions={rowActions} showRowActions
 			onFilter={handleFilter} onReset={handleReset} loading={loading} emptyMessage="No organizations found"
+			onRowClick={(row) => router.push(FrontendLinks.organizationDetails(row.id))}
 			pagination={{ currentPage: page, totalPages, totalItems, itemsPerPage, onPageChange: setPage, onItemsPerPageChange: handleItemsPerPageChange }}
 		/>
 	);

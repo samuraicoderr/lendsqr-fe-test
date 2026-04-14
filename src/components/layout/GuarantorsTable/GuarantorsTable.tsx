@@ -115,6 +115,7 @@ export default function GuarantorsTable() {
 		<GenericTable<GuarantorRecord>
 			columns={columns} data={rows} filters={filterConfig} rowActions={rowActions} showRowActions
 			onFilter={handleFilter} onReset={handleReset} loading={loading} emptyMessage="No guarantors found"
+			onRowClick={(row) => router.push(FrontendLinks.guarantorDetails(row.id))}
 			pagination={{ currentPage: page, totalPages, totalItems, itemsPerPage, onPageChange: setPage, onItemsPerPageChange: handleItemsPerPageChange }}
 		/>
 	);

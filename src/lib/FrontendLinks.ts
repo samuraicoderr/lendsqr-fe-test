@@ -21,7 +21,9 @@ const FrontendLinks = {
     loanRequests: "/dashboard/loan-requests",
     loanRequestDetails: (id: string) => `/dashboard/loan-requests/${id}`,
     whitelist: "/dashboard/whitelist",
+    whitelistDetails: (id: string) => `/dashboard/whitelist/${id}`,
     karma: "/dashboard/karma",
+    karmaDetails: (id: string) => `/dashboard/karma/${id}`,
     borrowers: "/dashboard/borrowers",
     borrowerDetails: (id: string) => `/dashboard/borrowers/${id}`,
     // businesses
@@ -38,6 +40,7 @@ const FrontendLinks = {
     services: "/dashboard/services",
     serviceDetails: (id: string) => `/dashboard/services/${id}`,
     serviceAccount: "/dashboard/service-account",
+    serviceAccountDetails: (id: string) => `/dashboard/service-account/${id}`,
     settlements: "/dashboard/settlements",
     settlementDetails: (id: string) => `/dashboard/settlements/${id}`,
     reports: "/dashboard/reports",

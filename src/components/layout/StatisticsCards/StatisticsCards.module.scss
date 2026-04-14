@@ -73,10 +73,15 @@ $transition-base: v.$transition-base;
 	margin-bottom: 14px;
 }
 
-.icon {
-	width: 100%;
-	height: auto;
+.iconFancy {
+	width: 22px;
+	height: 22px;
 	object-fit: contain;
+}
+
+.iconFont {
+	font-size: 20px;
+	line-height: 1;
 }
 
 .label {

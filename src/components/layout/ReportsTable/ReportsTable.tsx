@@ -57,5 +57,5 @@ export default function ReportsTable() {
 		{ id: "view", label: "View Report", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: RptRecord) => { router.push(FrontendLinks.reportDetails(row.id)); } },
 		{ id: "run", label: "Run Now", icon: <img src="/media/icons/sliders.svg" alt="" width={16} height={16} />, onClick: async (row: RptRecord) => { setLoading(true); db = db.map((r) => r.id === row.id ? { ...r, last_generated: new Date().toISOString().slice(0, 10) } : r); await runList(); } },
 	], [runList]);
-	return (<GenericTable<RptRecord> columns={columns} data={rows} filters={filterConfig} rowActions={rowActions} showRowActions onFilter={handleFilter} onReset={handleReset} loading={loading} emptyMessage="No reports found" pagination={{ currentPage: page, totalPages, totalItems, itemsPerPage, onPageChange: setPage, onItemsPerPageChange: handleItemsPerPageChange }} />);
+	return (<GenericTable<RptRecord> columns={columns} data={rows} filters={filterConfig} rowActions={rowActions} showRowActions onFilter={handleFilter} onReset={handleReset} loading={loading} emptyMessage="No reports found" onRowClick={(row) => router.push(FrontendLinks.reportDetails(row.id))} pagination={{ currentPage: page, totalPages, totalItems, itemsPerPage, onPageChange: setPage, onItemsPerPageChange: handleItemsPerPageChange }} />);
 }

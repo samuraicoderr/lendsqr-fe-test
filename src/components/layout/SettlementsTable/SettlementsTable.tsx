@@ -54,5 +54,5 @@ export default function SettlementsTable() {
 	const rowActions: RowAction[] = useMemo(() => [
 		{ id: "view", label: "View Details", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: SetRecord) => { router.push(FrontendLinks.settlementDetails(row.id)); } },
 	], []);
-	return (<GenericTable<SetRecord> columns={columns} data={rows} filters={filterConfig} rowActions={rowActions} showRowActions onFilter={handleFilter} onReset={handleReset} loading={loading} emptyMessage="No settlements found" pagination={{ currentPage: page, totalPages, totalItems, itemsPerPage, onPageChange: setPage, onItemsPerPageChange: handleItemsPerPageChange }} />);
+	return (<GenericTable<SetRecord> columns={columns} data={rows} filters={filterConfig} rowActions={rowActions} showRowActions onFilter={handleFilter} onReset={handleReset} loading={loading} emptyMessage="No settlements found" onRowClick={(row) => router.push(FrontendLinks.settlementDetails(row.id))} pagination={{ currentPage: page, totalPages, totalItems, itemsPerPage, onPageChange: setPage, onItemsPerPageChange: handleItemsPerPageChange }} />);
 }

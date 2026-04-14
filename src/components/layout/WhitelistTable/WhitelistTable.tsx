@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import FrontendLinks from "@/lib/FrontendLinks";
 import GenericTable, { Column, FilterConfig, FilterValues, RowAction } from "@/components/layout/GenericTable/GenericTable";
 
 type WhitelistRecord = {
@@ -56,6 +58,7 @@ const fmtDate = (v: string) => {
 };
 
 export default function WhitelistTable() {
+	const router = useRouter();
 	const [rows, setRows] = useState<WhitelistRecord[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [page, setPage] = useState(1);
@@ -97,14 +100,15 @@ export default function WhitelistTable() {
 	const handleItemsPerPageChange = useCallback((n: number) => { setItemsPerPage(n); setPage(1); }, []);
 
 	const rowActions: RowAction[] = useMemo(() => [
-		{ id: "view", label: "View Details", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: WhitelistRecord) => { console.log("View whitelist:", row.id); } },
+		{ id: "view", label: "View Details", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: WhitelistRecord) => { router.push(FrontendLinks.whitelistDetails(row.id)); } },
 		{ id: "remove", label: "Remove", icon: <img src="/media/icons/user-times.svg" alt="" width={16} height={16} />, onClick: async (row: WhitelistRecord) => { setLoading(true); db = db.filter((w) => w.id !== row.id); await runList(); } },
-	], [runList]);
+	], [runList, router]);
 
 	return (
 		<GenericTable<WhitelistRecord>
 			columns={columns} data={rows} filters={filterConfig} rowActions={rowActions} showRowActions
 			onFilter={handleFilter} onReset={handleReset} loading={loading} emptyMessage="No whitelist entries found"
+			onRowClick={(row) => router.push(FrontendLinks.whitelistDetails(row.id))}
 			pagination={{ currentPage: page, totalPages, totalItems, itemsPerPage, onPageChange: setPage, onItemsPerPageChange: handleItemsPerPageChange }}
 		/>
 	);

@@ -113,6 +113,7 @@ export default function LoanRequestsTable() {
 		<GenericTable<LoanRequestRecord>
 			columns={columns} data={rows} filters={filterConfig} rowActions={rowActions} showRowActions
 			onFilter={handleFilter} onReset={handleReset} loading={loading} emptyMessage="No loan requests found"
+			onRowClick={(row) => router.push(FrontendLinks.loanRequestDetails(row.id))}
 			pagination={{ currentPage: page, totalPages, totalItems, itemsPerPage, onPageChange: setPage, onItemsPerPageChange: handleItemsPerPageChange }}
 		/>
 	);

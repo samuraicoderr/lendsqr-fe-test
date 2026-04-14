@@ -60,5 +60,5 @@ export default function TransactionsTable() {
 		{ id: "view", label: "View Details", icon: <img src="/media/icons/eye.svg" alt="" width={16} height={16} />, onClick: (row: TxRecord) => { router.push(FrontendLinks.transactionDetails(row.id)); } },
 		{ id: "retry", label: "Retry", icon: <img src="/media/icons/sliders.svg" alt="" width={16} height={16} />, onClick: async (row: TxRecord) => { setLoading(true); db = db.map((t) => t.id === row.id ? { ...t, status: "Processing" } : t); await runList(); } },
 	], [runList]);
-	return (<GenericTable<TxRecord> columns={columns} data={rows} filters={filterConfig} rowActions={rowActions} showRowActions onFilter={handleFilter} onReset={handleReset} loading={loading} emptyMessage="No transactions found" pagination={{ currentPage: page, totalPages, totalItems, itemsPerPage, onPageChange: setPage, onItemsPerPageChange: handleItemsPerPageChange }} />);
+	return (<GenericTable<TxRecord> columns={columns} data={rows} filters={filterConfig} rowActions={rowActions} showRowActions onFilter={handleFilter} onReset={handleReset} loading={loading} emptyMessage="No transactions found" onRowClick={(row) => router.push(FrontendLinks.transactionDetails(row.id))} pagination={{ currentPage: page, totalPages, totalItems, itemsPerPage, onPageChange: setPage, onItemsPerPageChange: handleItemsPerPageChange }} />);
 }
