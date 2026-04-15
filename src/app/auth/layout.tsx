@@ -34,7 +34,7 @@ export default function AuthLayout({
       {/* Right Side - Form */}
       <div className={styles.formSection}>
         {/* RIGHT LOGO (only shows when left panel collapses) */}
-        <div className={styles.logoRight}>
+        {/* <div className={styles.logoRight}>
           <Link href={FrontendLinks.mainWebsite} target="_blank" rel="noopener noreferrer">
             <img
               src="/media/logos/main-logo.svg"
@@ -42,7 +42,7 @@ export default function AuthLayout({
               className={styles.lendsqrLogo}
             />
           </Link>
-        </div>
+        </div> */}
 
         <div className={styles.formContainer}>{children}</div>
       </div>

@@ -1,50 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import FrontendLinks from '@/lib/FrontendLinks';
-import Link from 'next/link';
-import styles from './UserDetails.module.scss';
-
-// Types
-interface UserDetailsData {
-  id: string;
-  fullName: string;
-  userId: string;
-  tier: number;
-  balance: string;
-  accountNumber: string;
-  bank: string;
-  personalInfo: {
-    fullName: string;
-    phoneNumber: string;
-    email: string;
-    bvn: string;
-    gender: string;
-    maritalStatus: string;
-    children: string;
-    residenceType: string;
-  };
-  educationEmployment: {
-    level: string;
-    employmentStatus: string;
-    sector: string;
-    duration: string;
-    officeEmail: string;
-    monthlyIncome: string;
-    loanRepayment: string;
-  };
-  socials: {
-    twitter: string;
-    facebook: string;
-    instagram: string;
-  };
-  guarantors: Array<{
-    fullName: string;
-    phoneNumber: string;
-    email: string;
-    relationship: string;
-  }>;
-}
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import FrontendLinks from "@/lib/FrontendLinks";
+import Link from "next/link";
+import styles from "./UserDetails.module.scss";
+import UserService from "@/lib/api/services/User.Service";
+import type { UserDetailsData } from "@/lib/api/types/user.types";
 
 interface UserDetailsProps {
   userId?: string;
@@ -54,106 +15,84 @@ interface UserDetailsProps {
   className?: string;
 }
 
-// Simulated API - replace with real API call
-const fetchUserDetails = async (id: string): Promise<UserDetailsData> => {
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  return {
-    id,
-    fullName: 'Grace Effiom',
-    userId: 'LSQFf587g90',
-    tier: 2,
-    balance: '₦200,000.00',
-    accountNumber: '9912345678',
-    bank: 'Providus Bank',
-    personalInfo: {
-      fullName: 'Grace Effiom',
-      phoneNumber: '07060780922',
-      email: 'grace@gmail.com',
-      bvn: '07060780922',
-      gender: 'Female',
-      maritalStatus: 'Single',
-      children: 'None',
-      residenceType: "Parent's Apartment"
-    },
-    educationEmployment: {
-      level: 'B.Sc',
-      employmentStatus: 'Employed',
-      sector: 'FinTech',
-      duration: '2 years',
-      officeEmail: 'grace@lendsqr.com',
-      monthlyIncome: '₦200,000.00- ₦400,000.00',
-      loanRepayment: '40,000'
-    },
-    socials: {
-      twitter: '@grace_effiom',
-      facebook: 'Grace Effiom',
-      instagram: '@grace_effiom'
-    },
-    guarantors: [
-      {
-        fullName: 'Debby Ogana',
-        phoneNumber: '07060780922',
-        email: 'debby@gmail.com',
-        relationship: 'Sister'
-      },
-      {
-        fullName: 'Debby Ogana',
-        phoneNumber: '07060780922',
-        email: 'debby@gmail.com',
-        relationship: 'Sister'
-      }
-    ]
-  };
-};
-
 const UserDetails: React.FC<UserDetailsProps> = ({
-  userId = '1',
+  userId = "1",
   onBack,
   onBlacklist,
   onActivate,
-  className = ''
+  className = "",
 }) => {
   const [user, setUser] = useState<UserDetailsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState('general');
+  const [activeTab, setActiveTab] = useState("general");
 
-  useEffect(() => {
-    const loadUser = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await fetchUserDetails(userId);
-        setUser(data);
-      } catch (err) {
-        setError('Failed to load user details');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadUser();
+  const loadUser = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await UserService.getUserById(userId);
+      setUser(data);
+    } catch (loadError) {
+      console.error("[UserDetails] Failed to load user:", loadError);
+      setError(loadError instanceof Error ? loadError.message : "Failed to load user details");
+    } finally {
+      setLoading(false);
+    }
   }, [userId]);
 
-  const tabs = [
-    { id: 'general', label: 'General Details' },
-    { id: 'documents', label: 'Documents' },
-    { id: 'bank', label: 'Bank Details' },
-    { id: 'loans', label: 'Loans' },
-    { id: 'savings', label: 'Savings' },
-    { id: 'app', label: 'App and System' }
-  ];
+  useEffect(() => {
+    void loadUser();
+  }, [loadUser]);
+
+  const tabs = useMemo(
+    () => [
+      { id: "general", label: "General Details" },
+      { id: "documents", label: "Documents" },
+      { id: "bank", label: "Bank Details" },
+      { id: "loans", label: "Loans" },
+      { id: "savings", label: "Savings" },
+      { id: "app", label: "App and System" },
+    ],
+    []
+  );
 
   const renderStars = (tier: number) => {
-    return Array.from({ length: 3 }, (_, i) => (
+    return Array.from({ length: 3 }, (_, index) => (
       <img
-        key={i} 
-        src={i < tier ? '/media/icons/orange-star-filled.svg' : '/media/icons/orange-star-outlined.svg'}
-        alt={i < tier ? 'Filled star' : 'Outlined star'}
-        className={i < tier ? styles.starFilled : styles.starEmpty}
+        key={index}
+        src={index < tier ? "/media/icons/orange-star-filled.svg" : "/media/icons/orange-star-outlined.svg"}
+        alt={index < tier ? "Filled star" : "Outlined star"}
+        className={index < tier ? styles.starFilled : styles.starEmpty}
       />
     ));
+  };
+
+  const persistStatus = async (status: NonNullable<UserDetailsData["status"]>) => {
+    if (!user) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const updatedUser = await UserService.patchUser(user.id, { status });
+      setUser(updatedUser);
+    } catch (updateError) {
+      console.error("[UserDetails] Failed to update status:", updateError);
+      setError(updateError instanceof Error ? updateError.message : "Failed to update user status");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBlacklist = async () => {
+    onBlacklist?.();
+    await persistStatus("Blacklisted");
+  };
+
+  const handleActivate = async () => {
+    onActivate?.();
+    await persistStatus("Active");
   };
 
   const renderGeneralDetails = (details: UserDetailsData) => (
@@ -255,8 +194,8 @@ const UserDetails: React.FC<UserDetailsProps> = ({
       <div className={styles.sectionDivider} />
 
       {details.guarantors.map((guarantor, index) => (
-        <section key={index} className={styles.section}>
-          <h3 className={styles.sectionTitle}>{index === 0 ? 'Guarantor' : ''}</h3>
+        <section key={`${guarantor.fullName}-${index}`} className={styles.section}>
+          <h3 className={styles.sectionTitle}>{index === 0 ? "Guarantor" : ""}</h3>
           <div className={styles.infoGrid}>
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>full Name</span>
@@ -283,7 +222,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({
 
   const renderTabContent = (details: UserDetailsData) => {
     switch (activeTab) {
-      case 'documents':
+      case "documents":
         return (
           <section className={styles.section}>
             <h3 className={styles.sectionTitle}>Documents</h3>
@@ -303,54 +242,99 @@ const UserDetails: React.FC<UserDetailsProps> = ({
             </div>
           </section>
         );
-      case 'bank':
+      case "bank":
         return (
           <section className={styles.section}>
             <h3 className={styles.sectionTitle}>Bank Details</h3>
             <div className={styles.infoGrid}>
-              <div className={styles.infoItem}><span className={styles.infoLabel}>Account Number</span><span className={styles.infoValue}>{details.accountNumber}</span></div>
-              <div className={styles.infoItem}><span className={styles.infoLabel}>Bank Name</span><span className={styles.infoValue}>{details.bank}</span></div>
-              <div className={styles.infoItem}><span className={styles.infoLabel}>Current Balance</span><span className={styles.infoValue}>{details.balance}</span></div>
-              <div className={styles.infoItem}><span className={styles.infoLabel}>Card Status</span><span className={styles.infoValue}>Active</span></div>
-              <div className={styles.infoItem}><span className={styles.infoLabel}>Default Currency</span><span className={styles.infoValue}>NGN</span></div>
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Account Number</span>
+                <span className={styles.infoValue}>{details.accountNumber}</span>
+              </div>
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Bank Name</span>
+                <span className={styles.infoValue}>{details.bank}</span>
+              </div>
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Current Balance</span>
+                <span className={styles.infoValue}>{details.balance}</span>
+              </div>
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Card Status</span>
+                <span className={styles.infoValue}>Active</span>
+              </div>
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Default Currency</span>
+                <span className={styles.infoValue}>NGN</span>
+              </div>
             </div>
           </section>
         );
-      case 'loans':
+      case "loans":
         return (
           <section className={styles.section}>
             <h3 className={styles.sectionTitle}>Loans</h3>
             <div className={styles.tabCardsGrid}>
-              <article className={styles.tabCard}><h4 className={styles.tabCardTitle}>Micro Loan</h4><p className={styles.tabCardMeta}>Outstanding: ₦45,000 • Due in 12 days</p></article>
-              <article className={styles.tabCard}><h4 className={styles.tabCardTitle}>Salary Advance</h4><p className={styles.tabCardMeta}>Outstanding: ₦12,000 • Due in 5 days</p></article>
+              <article className={styles.tabCard}>
+                <h4 className={styles.tabCardTitle}>Micro Loan</h4>
+                <p className={styles.tabCardMeta}>Outstanding: ₦45,000 • Due in 12 days</p>
+              </article>
+              <article className={styles.tabCard}>
+                <h4 className={styles.tabCardTitle}>Salary Advance</h4>
+                <p className={styles.tabCardMeta}>Outstanding: ₦12,000 • Due in 5 days</p>
+              </article>
             </div>
           </section>
         );
-      case 'savings':
+      case "savings":
         return (
           <section className={styles.section}>
             <h3 className={styles.sectionTitle}>Savings</h3>
             <div className={styles.infoGrid}>
-              <div className={styles.infoItem}><span className={styles.infoLabel}>Total Savings</span><span className={styles.infoValue}>₦320,000.00</span></div>
-              <div className={styles.infoItem}><span className={styles.infoLabel}>Plan</span><span className={styles.infoValue}>Flex Save</span></div>
-              <div className={styles.infoItem}><span className={styles.infoLabel}>Monthly Contribution</span><span className={styles.infoValue}>₦25,000.00</span></div>
-              <div className={styles.infoItem}><span className={styles.infoLabel}>Maturity Date</span><span className={styles.infoValue}>14 Dec 2026</span></div>
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Total Savings</span>
+                <span className={styles.infoValue}>₦320,000.00</span>
+              </div>
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Plan</span>
+                <span className={styles.infoValue}>Flex Save</span>
+              </div>
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Monthly Contribution</span>
+                <span className={styles.infoValue}>₦25,000.00</span>
+              </div>
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Maturity Date</span>
+                <span className={styles.infoValue}>14 Dec 2026</span>
+              </div>
             </div>
           </section>
         );
-      case 'app':
+      case "app":
         return (
           <section className={styles.section}>
             <h3 className={styles.sectionTitle}>App and System</h3>
             <div className={styles.infoGrid}>
-              <div className={styles.infoItem}><span className={styles.infoLabel}>Last Login</span><span className={styles.infoValue}>11 Apr 2026, 09:13</span></div>
-              <div className={styles.infoItem}><span className={styles.infoLabel}>Device</span><span className={styles.infoValue}>iPhone 13 • iOS 17</span></div>
-              <div className={styles.infoItem}><span className={styles.infoLabel}>2FA</span><span className={styles.infoValue}>Enabled</span></div>
-              <div className={styles.infoItem}><span className={styles.infoLabel}>KYC Level</span><span className={styles.infoValue}>Tier {details.tier}</span></div>
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Last Login</span>
+                <span className={styles.infoValue}>11 Apr 2026, 09:13</span>
+              </div>
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Device</span>
+                <span className={styles.infoValue}>iPhone 13 • iOS 17</span>
+              </div>
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>2FA</span>
+                <span className={styles.infoValue}>Enabled</span>
+              </div>
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>KYC Level</span>
+                <span className={styles.infoValue}>Tier {details.tier}</span>
+              </div>
             </div>
           </section>
         );
-      case 'general':
+      case "general":
       default:
         return renderGeneralDetails(details);
     }
@@ -372,8 +356,8 @@ const UserDetails: React.FC<UserDetailsProps> = ({
     return (
       <div className={`${styles.container} ${className}`}>
         <div className={styles.error}>
-          <span>{error || 'User not found'}</span>
-          <button onClick={() => window.location.reload()}>Retry</button>
+          <span>{error || "User not found"}</span>
+          <button onClick={() => void loadUser()}>Retry</button>
         </div>
       </div>
     );
@@ -381,8 +365,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({
 
   return (
     <div className={`${styles.container} ${className}`}>
-      {/* Back Button */}
-      <Link className={styles.backButton} href={FrontendLinks.users}>
+      <Link className={styles.backButton} href={FrontendLinks.users} onClick={onBack}>
         <img src="/media/icons/long-left-arrow.svg" alt="Back" className={styles.backIcon} />
         <span>Back to Users</span>
       </Link>
@@ -391,62 +374,48 @@ const UserDetails: React.FC<UserDetailsProps> = ({
         <h1 className={styles.pageTitle}>User Details</h1>
 
         <div className={styles.actionButtons}>
-          <button 
-            className={styles.blacklistButton}
-            onClick={onBlacklist}
-          >
+          <button className={styles.blacklistButton} onClick={() => void handleBlacklist()}>
             BLACKLIST USER
           </button>
-          <button 
-            className={styles.activateButton}
-            onClick={onActivate}
-          >
+          <button className={styles.activateButton} onClick={() => void handleActivate()}>
             ACTIVATE USER
           </button>
         </div>
       </div>
 
-      {/* Profile Card */}
       <div className={styles.profileCard}>
         <div className={styles.profileHeader}>
-          {/* Avatar */}
           <div className={styles.avatar}>
             <div className={styles.avatarPlaceholder}>
               <img src="/media/icons/default-user.svg" alt="User avatar" className={styles.avatarIcon} />
             </div>
           </div>
 
-          {/* Name & ID */}
           <div className={styles.nameSection}>
             <h2 className={styles.userName}>{user.fullName}</h2>
             <span className={styles.userId}>{user.userId}</span>
           </div>
 
-          {/* Divider */}
           <div className={styles.divider} />
 
-          {/* Tier */}
           <div className={styles.tierSection}>
             <span className={styles.tierLabel}>User's Tier</span>
             <div className={styles.stars}>{renderStars(user.tier)}</div>
           </div>
 
-          {/* Divider */}
           <div className={styles.divider} />
 
-          {/* Balance */}
           <div className={styles.balanceSection}>
             <span className={styles.balance}>{user.balance}</span>
             <span className={styles.account}>{user.accountNumber}/{user.bank}</span>
           </div>
         </div>
 
-        {/* Tabs */}
         <div className={styles.tabs}>
-          {tabs.map(tab => (
+          {tabs.map((tab) => (
             <button
               key={tab.id}
-              className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
+              className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ""}`}
               onClick={() => setActiveTab(tab.id)}
             >
               {tab.label}
@@ -456,10 +425,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({
         </div>
       </div>
 
-      {/* Details Content */}
-      <div className={styles.detailsCard}>
-        {renderTabContent(user)}
-      </div>
+      <div className={styles.detailsCard}>{renderTabContent(user)}</div>
     </div>
   );
 };
