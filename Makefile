@@ -10,6 +10,8 @@ runserver:
 build:
 	npm run build
 
+tests:
+	npm test -- --runInBand
 
 lint:
 	npm run lint
