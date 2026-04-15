@@ -5,6 +5,7 @@ import FrontendLinks from "@/lib/FrontendLinks";
 import StatusPill from "@/components/ui/StatusPill";
 import ConfirmModal from "@/components/ui/ConfirmModal/ConfirmModal";
 import s from "@/components/layout/DetailView/DetailView.module.scss";
+import TransactionService from "@/lib/api/services/Transaction.Service";
 
 interface TimelineEvent { action: string; date: string; details: string; }
 interface TransactionData {
@@ -20,19 +21,7 @@ const fmt = (v: number) => `₦${v.toLocaleString("en-US")}`;
 const fmtDate = (v: string) => { if (!v) return "—"; const d = new Date(v); return isNaN(d.getTime()) ? v : d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) + " " + d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }); };
 
 const fetchTxn = async (id: string): Promise<TransactionData> => {
-	await delay(800);
-	return {
-		id, reference: "TXN-2026-0412-001", type: "Loan Repayment", user: "Adeyemi Okafor", userEmail: "adeyemi@lendsqr.com", organization: "Lendsqr HQ",
-		amount: 47917, currency: "NGN", status: "Completed",
-		sourceType: "Bank Account", sourceAccount: "GTB •••• 6789", destType: "Loan Account", destAccount: "LN-2023-001",
-		processedAt: "2026-04-12T04:30:00", completedAt: "2026-04-12T04:30:05", failedAt: "", failureReason: "",
-		ipAddress: "102.89.23.45", userAgent: "Chrome/120 (iPhone)", createdAt: "2026-04-12T04:29:55",
-		timeline: [
-			{ action: "Transaction Created", date: "2026-04-12T04:29:55", details: "Payment initiated by Adeyemi Okafor via mobile app" },
-			{ action: "Processing", date: "2026-04-12T04:30:00", details: "Payment sent to GTBank for processing" },
-			{ action: "Completed", date: "2026-04-12T04:30:05", details: "Payment confirmed and credited to loan account LN-2023-001" },
-		],
-	};
+	return TransactionService.getTransactionById(id);
 };
 
 interface TransactionDetailProps { txnId?: string; className?: string; }
@@ -48,7 +37,7 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({ txnId = "1", clas
 	const load = useCallback(async () => { try { setLoading(true); setError(null); setData(await fetchTxn(txnId)); } catch { setError("Failed to load"); } finally { setLoading(false); } }, [txnId]);
 	useEffect(() => { load(); }, [load]);
 	const showToast = (msg: string, v = "success") => { setToast({ show: true, message: msg, variant: v }); setTimeout(() => setToast(p => ({ ...p, show: false })), 3000); };
-	const handleAction = async () => { if (!data) return; await delay(500); if (modal.action === "refund") { setData({ ...data, status: "Refunded" }); showToast("Transaction refunded"); } else if (modal.action === "retry") { setData({ ...data, status: "Processing" }); showToast("Transaction retried"); } setModal(m => ({ ...m, open: false })); };
+	const handleAction = async () => { if (!data) return; if (modal.action === "refund") { const updated = await TransactionService.patchTransaction(data.id, { status: "Completed" as any }); setData(updated as any); showToast("Transaction refunded"); } else if (modal.action === "retry") { const updated = await TransactionService.patchTransaction(data.id, { status: "Processing" }); setData(updated as any); showToast("Transaction retried"); } setModal(m => ({ ...m, open: false })); };
 
 	const tabs = [{ id: "info", label: "Transaction Info" }, { id: "timeline", label: "Timeline" }];
 

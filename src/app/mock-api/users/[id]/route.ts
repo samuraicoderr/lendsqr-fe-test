@@ -3,9 +3,10 @@ import data from "../data";
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const user = data.find((u) => u.id === params.id);
+  const { id } = await params;
+  const user = data.find((u) => u.id === id);
 
   if (!user) {
     return NextResponse.json(
@@ -19,10 +20,11 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const body = await req.json().catch(() => ({}));
-  const user = data.find((entry) => entry.id === params.id);
+  const { id } = await params;
+  const user = data.find((entry) => entry.id === id);
 
   if (!user) {
     return NextResponse.json({ message: "User not found" }, { status: 404 });
@@ -33,7 +35,7 @@ export async function PATCH(
     ...body,
   };
 
-  const index = data.findIndex((entry) => entry.id === params.id);
+  const index = data.findIndex((entry) => entry.id === id);
   if (index >= 0) {
     data[index] = nextUser;
   }
@@ -43,7 +45,7 @@ export async function PATCH(
 
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   return PATCH(req, { params });
 }

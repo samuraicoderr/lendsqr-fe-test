@@ -6,6 +6,7 @@ import FrontendLinks from "@/lib/FrontendLinks";
 import StatusPill from "@/components/ui/StatusPill";
 import ConfirmModal from "@/components/ui/ConfirmModal/ConfirmModal";
 import s from "@/components/layout/DetailView/DetailView.module.scss";
+import LoanService from "@/lib/api/services/Loan.Service";
 
 /* ── Types ── */
 interface LoanScheduleItem { installment: number; dueDate: string; principal: number; interest: number; total: number; paid: number; status: string; }
@@ -28,34 +29,7 @@ const fmt = (v: number) => `₦${v.toLocaleString("en-US")}`;
 const fmtDate = (v: string) => { if (!v) return "—"; const d = new Date(v); return isNaN(d.getTime()) ? v : d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }); };
 
 const fetchLoan = async (id: string): Promise<LoanData> => {
-	await delay(800);
-	return {
-		id, loanNumber: "LN-2023-001", borrower: "Adeyemi Okafor", borrowerEmail: "adeyemi@lendsqr.com", organization: "Lendsqr HQ",
-		product: "Micro Loan", purpose: "Business expansion — purchase of additional inventory for retail shop.", status: "Active",
-		principalAmount: 250000, interestRate: "15%", interestType: "Flat", tenureMonths: 6,
-		interestAmount: 37500, processingFee: 3750, insuranceFee: 1250, totalAmountDue: 292500,
-		totalRepaid: 125000, totalOutstanding: 167500, nextDueDate: "2026-05-01", lastPaymentDate: "2026-04-01",
-		disbursementStatus: "Disbursed", disbursedAt: "2023-06-15T10:30:00", disbursedBy: "Jane Okafor",
-		disbursementAccount: "0123456789", disbursementBank: "GTBank", repaymentStatus: "On Track",
-		createdAt: "2023-06-10T08:00:00",
-		schedule: [
-			{ installment: 1, dueDate: "2023-07-15", principal: 41667, interest: 6250, total: 47917, paid: 47917, status: "Paid" },
-			{ installment: 2, dueDate: "2023-08-15", principal: 41667, interest: 6250, total: 47917, paid: 47917, status: "Paid" },
-			{ installment: 3, dueDate: "2023-09-15", principal: 41667, interest: 6250, total: 47917, paid: 29166, status: "Late" },
-			{ installment: 4, dueDate: "2023-10-15", principal: 41667, interest: 6250, total: 47917, paid: 0, status: "Pending" },
-			{ installment: 5, dueDate: "2023-11-15", principal: 41667, interest: 6250, total: 47917, paid: 0, status: "Pending" },
-			{ installment: 6, dueDate: "2023-12-15", principal: 41665, interest: 6250, total: 47915, paid: 0, status: "Pending" },
-		],
-		payments: [
-			{ id: "p1", amount: 47917, method: "Bank Transfer", reference: "PAY-001-2023", principalPortion: 41667, interestPortion: 6250, paidAt: "2023-07-14T09:00:00" },
-			{ id: "p2", amount: 47917, method: "Card Payment", reference: "PAY-002-2023", principalPortion: 41667, interestPortion: 6250, paidAt: "2023-08-15T11:30:00" },
-			{ id: "p3", amount: 29166, method: "Bank Transfer", reference: "PAY-003-2023", principalPortion: 22916, interestPortion: 6250, paidAt: "2023-09-20T14:00:00" },
-		],
-		guarantors: [
-			{ id: "g1", fullName: "Debby Ogana", phone: "+234 803 100 0001", email: "debby@gmail.com", relationship: "Sister", guaranteedAmount: 125000, status: "Active" },
-			{ id: "g2", fullName: "Emeka Okafor", phone: "+234 803 100 0002", email: "emeka.o@yahoo.com", relationship: "Brother", guaranteedAmount: 125000, status: "Active" },
-		],
-	};
+	return LoanService.getLoanById(id);
 };
 
 /* ── Component ── */
@@ -80,9 +54,9 @@ const LoanDetail: React.FC<LoanDetailProps> = ({ loanId = "1", className = "" })
 	const handleAction = async () => {
 		if (!loan) return;
 		await delay(500);
-		if (modal.action === "disburse") { setLoan({ ...loan, status: "Disbursed", disbursementStatus: "Disbursed", disbursedAt: new Date().toISOString() }); showToast("Loan disbursed successfully"); }
-		else if (modal.action === "default") { setLoan({ ...loan, status: "Defaulted", repaymentStatus: "Defaulted" }); showToast("Loan marked as defaulted", "danger"); }
-		else if (modal.action === "writeoff") { setLoan({ ...loan, status: "Written Off" }); showToast("Loan written off"); }
+		if (modal.action === "disburse") { const updated = await LoanService.patchLoan(loan.id, { status: "Disbursed" }); setLoan(updated); showToast("Loan disbursed successfully"); }
+		else if (modal.action === "default") { const updated = await LoanService.patchLoan(loan.id, { status: "Defaulted" }); setLoan(updated); showToast("Loan marked as defaulted", "danger"); }
+		else if (modal.action === "writeoff") { const updated = await LoanService.patchLoan(loan.id, { status: "Written Off" }); setLoan(updated); showToast("Loan written off"); }
 		setModal({ ...modal, open: false });
 	};
 

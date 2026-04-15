@@ -1,0 +1,15 @@
+[
+  '{{repeat(80)}}',
+  {
+    "id": "{{guid()}}",
+    "reference": "TXN-{{integer(2020,2027)}}-{{integer(100,999)}}",
+    "user": "{{firstName()}} {{surname()}}",
+    "transaction_type": "{{random('Loan Disbursement', 'Loan Repayment', 'Savings Deposit', 'Savings Withdrawal', 'Fee Payment')}}",
+    "amount": "{{integer(1000,500000)}}",
+    "currency": "NGN",
+    "channel": "{{random('Bank Transfer', 'Card Payment', 'USSD', 'Auto Debit')}}",
+    "description": "{{random('Payment initiated', 'Monthly repayment', 'Savings movement', 'Fee processing', 'Transfer completed')}}",
+    "status": "{{random('Completed', 'Processing', 'Failed', 'Pending')}}",
+    "date": "{{date(new Date(2020, 0, 1), new Date(), 'YYYY-MM-ddTHH:mm:ss')}}"
+  }
+]

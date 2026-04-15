@@ -1,0 +1,15 @@
+[
+  '{{repeat(60)}}',
+  {
+    "id": "{{guid()}}",
+    "user": "{{firstName()}} {{surname()}}",
+    "email": "{{email()}}",
+    "product": "{{random('Micro Loan', 'Salary Advance', 'Business Loan', 'Personal Loan', 'Agriculture Loan')}}",
+    "requested_amount": "{{integer(50000,3000000)}}",
+    "requested_tenure": "{{random('1 month', '3 months', '6 months', '12 months', '18 months', '24 months', '36 months')}}",
+    "purpose": "{{random('Business expansion', 'School fees', 'Rent payment', 'Inventory restocking', 'Emergency medical', 'Equipment purchase')}}",
+    "decision_status": "{{random('Pending', 'Approved', 'Under Review', 'Rejected', 'Converted', 'Cancelled')}}",
+    "approved_amount": "{{integer(0,3000000)}}",
+    "date": "{{date(new Date(2020, 0, 1), new Date(), 'YYYY-MM-dd')}}"
+  }
+]

@@ -1,0 +1,16 @@
+[
+  '{{repeat(50)}}',
+  {
+    "id": "{{guid()}}",
+    "loan_number": "LN-{{integer(2020,2027)}}-{{integer(100,999)}}",
+    "borrower": "{{firstName()}} {{surname()}}",
+    "organization": "{{random('Lendsqr HQ', 'Lendsqr Finance', 'Lendsqr Labs')}}",
+    "principal": "{{integer(50000,1000000)}}",
+    "interest_rate": "{{integer(8,22)}}%",
+    "tenure": "{{random('3 months', '6 months', '12 months', '18 months', '24 months', '36 months')}}",
+    "total_repaid": "{{integer(0,1000000)}}",
+    "status": "{{random('Active', 'Completed', 'Defaulted', 'Pending', 'Disbursed', 'Rejected', 'Written Off')}}",
+    "next_due_date": "{{date(new Date(2026, 0, 1), new Date(2027, 11, 31), 'YYYY-MM-dd')}}",
+    "date": "{{date(new Date(2020, 0, 1), new Date(), 'YYYY-MM-dd')}}"
+  }
+]
