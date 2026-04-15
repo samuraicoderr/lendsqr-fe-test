@@ -1,0 +1,61 @@
+[
+  '{{repeat(500)}}',
+  {
+    "id": "{{guid()}}",
+    "organization": "{{random('Lendsqr', 'Irorun', 'Lendstar', 'Lendmax')}}",
+    "username": "{{firstName()}}",
+    "email": "{{email()}}",
+    "phone_number": "{{phone('+234 80########')}}",
+    "date": "{{date(new Date(2020, 0, 1), new Date(), 'YYYY-MM-dd')}}",
+    "status": "{{random('active', 'inactive', 'pending', 'blacklisted')}}",
+
+    "fullName": "{{firstName()}} {{surname()}}",
+    "userId": "LSQ{{integer(100000,999999)}}",
+    "tier": "{{integer(1,3)}}",
+    "balance": "₦{{integer(100000,500000)}}.00",
+    "accountNumber": "{{integer(1000000000,9999999999)}}",
+    "bank": "{{random('Providus Bank', 'GTBank', 'Access Bank', 'UBA')}}",
+
+    "personalInfo": {
+      "fullName": "{{firstName()}} {{surname()}}",
+      "phoneNumber": "{{phone('+234 80########')}}",
+      "email": "{{email()}}",
+      "bvn": "{{integer(10000000000,99999999999)}}",
+      "gender": "{{random('Male', 'Female')}}",
+      "maritalStatus": "{{random('Single', 'Married')}}",
+      "children": "{{random('0', '1', '2', '3', '4', '6')}}",
+      "residenceType": "{{random('Parent\\'s Apartment', 'Own Apartment', 'Rented Apartment')}}"
+    },
+
+    "educationEmployment": {
+      "level": "{{random('B.Sc', 'M.Sc', 'HND')}}",
+      "employmentStatus": "{{random('Employed', 'Unemployed', 'Self-employed')}}",
+      "sector": "{{random('FinTech', 'Banking', 'Education', 'Healthcare')}}",
+      "duration": "{{integer(1,10)}} years",
+      "officeEmail": "{{email()}}",
+      "monthlyIncome": "₦{{integer(100000,300000)}} - ₦{{integer(300000,800000)}}",
+      "loanRepayment": "₦{{integer(10000,100000)}}"
+    },
+
+    "socials": {
+      "twitter": "@{{username()}}",
+      "facebook": "{{firstName()}} {{surname()}}",
+      "instagram": "@{{username()}}"
+    },
+
+    "guarantors": [
+      {
+        "fullName": "{{firstName()}} {{surname()}}",
+        "phoneNumber": "{{phone('+234 80########')}}",
+        "email": "{{email()}}",
+        "relationship": "{{random('Sister', 'Brother', 'Friend', 'Parent')}}"
+      },
+      {
+        "fullName": "{{firstName()}} {{surname()}}",
+        "phoneNumber": "{{phone('+234 80########')}}",
+        "email": "{{email()}}",
+        "relationship": "{{random('Sister', 'Brother', 'Friend', 'Parent')}}"
+      }
+    ]
+  }
+]

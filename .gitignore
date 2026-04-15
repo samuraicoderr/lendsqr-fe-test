@@ -42,3 +42,4 @@ next-env.d.ts
 a.diff
 .lintErrors
 .lintErrors.fix
+.docs/*
