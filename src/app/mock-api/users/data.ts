@@ -1,4 +1,4 @@
-import { UserDetailsData } from "@/types/user.types";
+import { UserDetailsData } from "@/lib/api/types/user.types";
 
 const data : UserDetailsData[] = [
   {

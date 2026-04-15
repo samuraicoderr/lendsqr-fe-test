@@ -17,7 +17,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { Routes } from "../FrontendRoutes";
-import { BackendRoutes } from "../BackendRoutes";
+import { BackendRoutes } from "../../BackendLinks";
 import {
   tokenManager,
   authUtils,

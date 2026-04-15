@@ -1,5 +1,5 @@
 import { apiClient } from "../ApiClient";
-import { BackendRoutes } from "../BackendRoutes";
+import { BackendRoutes } from "../../BackendLinks";
 
 /* -------------------- TYPES -------------------- */
 

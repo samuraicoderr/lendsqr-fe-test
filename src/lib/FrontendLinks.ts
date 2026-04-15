@@ -54,4 +54,5 @@ const FrontendLinks = {
     systemMessageDetails: (id: string) => `/dashboard/systems-messages/${id}`,
 }
 
+export const FrontendRoutes = FrontendLinks;
 export default FrontendLinks;

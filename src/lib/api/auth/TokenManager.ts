@@ -5,7 +5,7 @@
 
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { BackendRoutes } from "../BackendRoutes";
+import { BackendRoutes } from "../../BackendLinks";
 import { AUTH_PRESENCE_COOKIE } from "@/lib/api/auth/redirect";
 // Types
 export interface TokenResponse {
